@@ -3,6 +3,7 @@ import 'constants/app_theme.dart';
 import 'screens/home/splash_screen.dart';
 
 class MyApp extends StatelessWidget{
+
   const MyApp ({
     super.key,
   });
