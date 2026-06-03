@@ -1,12 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:orbit/firebase_options.dart';
-import 'app.dart';
 import 'package:firebase_core/firebase_core.dart';
-void main() {
+import 'package:provider/provider.dart';
+import 'package:orbit/firebase_options.dart';
+import 'package:orbit/providers/auth_provider.dart';
+import 'app.dart';
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Firebase.initializeApp(
+
+  await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
-}
 
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => AuthProvider(),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
+}

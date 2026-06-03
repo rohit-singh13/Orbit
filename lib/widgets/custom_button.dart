@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class CustomButton extends StatelessWidget{
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   const CustomButton({
     super.key,
@@ -22,7 +22,7 @@ class CustomButton extends StatelessWidget{
             borderRadius: BorderRadius.circular(14),
           ),
       ),
-          onPressed: (){},
+          onPressed: onPressed,
           child: Text(text)),
 
     );
