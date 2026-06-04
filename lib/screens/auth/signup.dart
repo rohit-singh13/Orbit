@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:orbit/routes/app_routes.dart';
 import 'package:orbit/widgets/background_widget.dart';
 import 'package:orbit/widgets/auth_card.dart';
 import 'package:orbit/widgets/custom_button.dart';
@@ -63,7 +64,7 @@ class _SignupState extends State<Signup>{
                                 if (value == null || value.isEmpty) {
                                   return "Email is required";
                                 }
-                                if (!value.contains('@')) {
+                                if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
                                   return "Invalid email";
                                 }
                                 return null;
@@ -112,15 +113,18 @@ class _SignupState extends State<Signup>{
                                 password: password.text.trim(),
                               );
 
-                              if (!mounted) return;
-
-                              if (provider.error == null) {
+                              if (provider.error != null) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Account created successfully'),
+                                  SnackBar(
+                                    content: Text(provider.error!),
                                   ),
                                 );
+                                return;
                               }
+
+                              Navigator.pushNamed(
+                                  context,
+                                  AppRoutes.emailVerification);
                             },
                             text: authProvider.isLoading? "Creating Account..." : "Sign Up",
 

@@ -10,6 +10,9 @@ class AuthProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
+  bool get isLoggedIn => _authServices.isLoggedIn;
+  bool get isEmailVerified => _authServices.isEmailVerified;
+
   Future<void> signUp({
     required String email,
     required String password,
@@ -65,6 +68,27 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> sendVerificationEmail() async {
+    try {
+      _isLoading =true;
+      _error = null;
+      notifyListeners();
+      await _authServices.emailVerification();
+    } catch(e) {
+      _error =e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> checkEmailVerification() async {
+    await _authServices.currentUser?.reload();
+
+    return _authServices.currentUser?.emailVerified ?? false;
+  }
+
   Future<void> signOut() async {
     await _authServices.signOut();
     notifyListeners();

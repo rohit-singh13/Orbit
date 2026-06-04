@@ -5,6 +5,8 @@ class AuthServices {
   final _auth = FirebaseAuth.instance;
   Stream<User?> get authState => _auth.authStateChanges();
   User? get currentUser => _auth.currentUser;
+  bool get isLoggedIn => _auth.currentUser != null;
+  bool get isEmailVerified => _auth.currentUser?.emailVerified ?? false;
 
   Future<UserCredential> signUpWithEmailPassword({
     required String email,

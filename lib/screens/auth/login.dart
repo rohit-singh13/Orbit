@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:orbit/routes/app_routes.dart';
 import 'package:orbit/widgets/background_widget.dart';
 import 'package:orbit/widgets/auth_card.dart';
 import 'package:orbit/widgets/custom_button.dart';
@@ -81,12 +82,17 @@ class _LoginState extends State<Login>{
                             ),
                           ),
 
-                          TextButton(onPressed: (){},
+                          TextButton(onPressed: (){
+                            Navigator.pushNamed(
+                                context,
+                                AppRoutes.forgotPassword);
+                          },
                               child: const Text("Forgot Password?")),
 
                           SizedBox(height: 30,),
 
                           CustomButton(
+                              backgroundColor: const Color(0xff06B6D4),
                               text: authProvider.isLoading? "Logging In..." : "Login",
                               onPressed: authProvider.isLoading? null : () async{
                                 if (!_formKey.currentState!.validate()) {
@@ -104,13 +110,9 @@ class _LoginState extends State<Login>{
                                   return;
                                 }
                                 if(provider.error == null ) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                    content: Text (
-                                      "Logged in successfully"
-                                    ),
-                                  ),
-                                  );
+                                  Navigator.pushReplacementNamed(
+                                      context,
+                                      AppRoutes.home);
                                 }
                               }
                           ),

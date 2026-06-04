@@ -3,7 +3,7 @@ import 'package:orbit/screens/auth/forgot_password.dart';
 import 'package:orbit/screens/auth/login.dart';
 import 'package:orbit/screens/auth/signup.dart';
 import 'constants/app_theme.dart';
-import 'screens/home/introscreen.dart'; // change to any screen you want
+import 'screens/home/intro_screen.dart'; // change to any screen you want
 
 void main() {
   runApp(const DevApp());
@@ -22,7 +22,7 @@ class DevApp extends StatelessWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
 
-      home: const Signup(), //  change screen here
+      home: const IntroScreen(), //  change screen here
     );
   }
 }

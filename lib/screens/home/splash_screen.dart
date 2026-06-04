@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:orbit/screens/home/introscreen.dart';
+import 'package:orbit/routes/app_routes.dart';
+import 'package:orbit/services/auth_services.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -9,17 +10,31 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  final AuthServices _auth = AuthServices();
+
+  Future<void> checkUser() async {
+    await Future.delayed(const Duration(seconds: 1));
+    await _auth.currentUser?.reload();
+
+    if (!mounted) return;
+
+    if (_auth.isLoggedIn && _auth.isEmailVerified) {
+      Navigator.pushReplacementNamed(
+        context,
+        AppRoutes.home,
+      );
+    } else {
+      Navigator.pushReplacementNamed(
+        context,
+        AppRoutes.intro,
+      );
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) {
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const Introscreen()));
-      }
-    });
-
+    checkUser();
   }
 
   @override
