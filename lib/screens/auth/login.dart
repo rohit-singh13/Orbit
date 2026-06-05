@@ -152,7 +152,28 @@ class _LoginState extends State<Login>{
                           SizedBox(height: 20),
 
                           OutlinedButton(
-                              onPressed: (){},
+                              onPressed: authProvider.isLoading
+                                ? null
+                                : () async {
+                                final provider = context.read<AuthProvider>();
+
+                                await provider.signInWithGoogle();
+                                if(!mounted) return;
+
+                                if (provider.error != null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(provider.error!),
+                                      ));
+                                  return;
+                                }
+                                Navigator.pushReplacementNamed(
+                                    context,
+                                    AppRoutes.home
+                                );
+
+                              },
+
                               child: Text("Continue with Google")),
                         ],
                       ),
