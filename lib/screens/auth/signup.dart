@@ -17,7 +17,6 @@ class Signup extends StatefulWidget{
 class _SignupState extends State<Signup>{
   bool _isPasswordHidden = true;
 
-  TextEditingController name = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
 
@@ -43,19 +42,6 @@ class _SignupState extends State<Signup>{
                           Text("Your people. Your space. Your orbit.", style: TextStyle(fontSize: 25),),
 
                           SizedBox(height: 50,),
-
-                          CustomTextField(
-                              labelText: "Username",
-                              controller: name,
-                            validator: (value) {
-                                if(value == null || value.isEmpty) {
-                                  return "Username is required";
-                                }
-                                return null;
-                            },
-                          ),
-
-                          SizedBox(height: 10,),
 
                           CustomTextField(
                               labelText: "Email",
@@ -112,6 +98,7 @@ class _SignupState extends State<Signup>{
                                 email: email.text.trim(),
                                 password: password.text.trim(),
                               );
+                              if(!mounted) return;
 
                               if (provider.error != null) {
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -121,6 +108,10 @@ class _SignupState extends State<Signup>{
                                 );
                                 return;
                               }
+
+                              await provider.sendVerificationEmail();
+
+                              if(!mounted) return;
 
                               Navigator.pushNamed(
                                   context,
@@ -194,7 +185,6 @@ class _SignupState extends State<Signup>{
 
   @override
   void dispose(){
-    name.dispose();
     email.dispose();
     password.dispose();
     super.dispose();

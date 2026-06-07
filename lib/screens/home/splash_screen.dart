@@ -44,7 +44,7 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Stack(
         children: [
           Positioned.fill(
-            child: Image.asset(isDark? "assets/background/dark_theme.png" : "assets/background/light_theme.png",
+            child: Image.asset("assets/background/background_image.png",
             fit: BoxFit.cover,),
           ),
           Center(

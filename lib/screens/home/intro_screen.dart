@@ -114,7 +114,6 @@ class _IntroScreenState extends State<IntroScreen> {
 
                       CustomButton(
                         text: "Return to Your Orbit",
-                        backgroundColor: const Color(0xff06B6D4),
                         onPressed: () {
                           Navigator.pushNamed(
                             context,

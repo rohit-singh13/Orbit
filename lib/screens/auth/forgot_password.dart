@@ -60,7 +60,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                           SizedBox(height: 10,),
 
                           CustomButton(
-                              backgroundColor: const Color(0xff06B6D4),
                               text: authProvider.isLoading?
                               "Sending..." : "Send Reset Link",
                               onPressed: authProvider.isLoading?

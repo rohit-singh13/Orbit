@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:orbit/configuration/dependency_injection.dart';
 import 'package:provider/provider.dart';
 import 'package:orbit/firebase_options.dart';
-import 'package:orbit/providers/auth_provider.dart';
 import 'app.dart';
 
 Future<void> main() async {
@@ -14,11 +14,7 @@ Future<void> main() async {
 
   runApp(
     MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (_) => AuthProvider(),
-        ),
-      ],
+      providers: DependencyInjection.providers,
       child: const MyApp(),
     ),
   );

@@ -92,7 +92,6 @@ class _LoginState extends State<Login>{
                           SizedBox(height: 30,),
 
                           CustomButton(
-                              backgroundColor: const Color(0xff06B6D4),
                               text: authProvider.isLoading? "Logging In..." : "Login",
                               onPressed: authProvider.isLoading? null : () async{
                                 if (!_formKey.currentState!.validate()) {
@@ -110,9 +109,11 @@ class _LoginState extends State<Login>{
                                   return;
                                 }
                                 if(provider.error == null ) {
-                                  Navigator.pushReplacementNamed(
+                                  Navigator.pushNamedAndRemoveUntil(
                                       context,
-                                      AppRoutes.home);
+                                      AppRoutes.home,
+                                        (route) => false
+                                  );
                                 }
                               }
                           ),

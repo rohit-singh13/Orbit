@@ -58,9 +58,11 @@ class _EmailVerificationState extends State<EmailVerification> {
 
                               if(!mounted) return;
                               if(verified) {
-                                Navigator.pushReplacementNamed(
+                                Navigator.pushNamedAndRemoveUntil(
                                     context,
-                                    AppRoutes.home);
+                                    AppRoutes.profileSetup,
+                                    (route) => false
+                                );
                               }
                               else {
                                 ScaffoldMessenger.of(context).showSnackBar(

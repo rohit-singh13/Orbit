@@ -12,7 +12,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: AppBackground(
-          child: Text("Hello")),
+          child: Center(
+              child: Text("Welcome to the Orbit", style: TextStyle(fontSize: 20),))),
     );
   }
 }

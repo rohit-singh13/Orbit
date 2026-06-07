@@ -6,9 +6,9 @@ class AppTheme {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      Color(0xffFAF9FF),
-      Color(0xffF1ECFF),
-      Color(0xffE8E1FF),
+      Color(0xffF8FBFF),
+      Color(0xffEEF6FF),
+      Color(0xffE4F1FF),
     ],);
 
   static const LinearGradient darkGradient =
@@ -16,9 +16,9 @@ class AppTheme {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      Color(0xff0B1023),
-      Color(0xff161B3A),
-      Color(0xff24124D),
+      Color(0xff050816),
+      Color(0xff0D1226),
+      Color(0xff1A1F3A),
     ],);
 
   static LinearGradient backgroundGradient(BuildContext context)
@@ -30,9 +30,9 @@ class AppTheme {
     brightness: Brightness.light,
     scaffoldBackgroundColor: const Color(0xffFFFFFF ),
     colorScheme: const ColorScheme.light(
-      primary: Color(0xff7B61FF),
-      secondary: Color(0xffB26CFE),
-        surface: Color(0xffF6F2FF)
+      primary: Color(0xffB87333),
+      secondary: Color(0xffD8A47F),
+      surface: Color(0xffFFF8F3),
     ),
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.transparent,
@@ -40,8 +40,9 @@ class AppTheme {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xff7B61FF),
-          foregroundColor: Colors.white,
+        backgroundColor: const Color(0xffB87333),
+        foregroundColor: Colors.white,
+        elevation: 4,
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
@@ -50,25 +51,28 @@ class AppTheme {
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
       ),
-    )
+    ),
+
   );
 
   static ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
-    scaffoldBackgroundColor: const Color(0xff0B1023),
-    colorScheme: const ColorScheme.dark(
-      primary: Color(0xff8B5CF6),
-      secondary: Color(0xff06B6D4),
-      surface: Color(0xff222C52),
-    ),
+    scaffoldBackgroundColor: const Color(0xff050816),
+      colorScheme: const ColorScheme.dark(
+        primary: Color(0xffD4A44B),
+        secondary: Color(0xffF0C36A),
+        tertiary: Color(0xffFFE7A3),
+        surface: Color(0xff0D1226),
+      ),
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.transparent,
       elevation: 0,
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: Color(0xff8B5CF6),
+          backgroundColor: Color(0xffD4A44B),
         foregroundColor: Colors.white,
+        elevation: 8
       )
     ),
     inputDecorationTheme: InputDecorationTheme(
@@ -77,6 +81,11 @@ class AppTheme {
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
       ),
+    ),
+
+    cardTheme: CardThemeData(
+      color: const Color(0xff151B34),
+      elevation: 6
     )
   );
 }
