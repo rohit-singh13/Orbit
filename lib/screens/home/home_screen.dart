@@ -1,27 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:orbit/routes/app_routes.dart';
-import 'package:orbit/screens/home/bottom_navigation.dart';
 import 'package:orbit/widgets/background_widget.dart';
-
-class Explore extends StatefulWidget {
-  const Explore({super.key});
+import 'package:orbit/screens/home/bottom_navigation.dart';
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  State<Explore> createState() => _ExploreState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _ExploreState extends State<Explore> {
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: AppBackground(
           child: Center(
-            child: Text("World Exploring coming soon"),
-          )),
+              child: Text("Welcome to the Orbit", style: TextStyle(fontSize: 20),))),
       bottomNavigationBar: BottomNavigation(
-          currentIndex: 4,
+          currentIndex: 0,
           onTap: (index) {
-            if(index == 4) return;
+            if(index == 0) return;
             switch(index) {
               case 0:
                 Navigator.pushReplacementNamed(context, AppRoutes.home);
@@ -45,6 +43,5 @@ class _ExploreState extends State<Explore> {
             }
           }),
     );
-
   }
 }

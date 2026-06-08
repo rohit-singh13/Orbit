@@ -3,25 +3,26 @@ import 'package:orbit/routes/app_routes.dart';
 import 'package:orbit/screens/home/bottom_navigation.dart';
 import 'package:orbit/widgets/background_widget.dart';
 
-class Explore extends StatefulWidget {
-  const Explore({super.key});
+class Signal extends StatefulWidget {
+  const Signal({super.key});
 
   @override
-  State<Explore> createState() => _ExploreState();
+  State<Signal> createState() => _SignalState();
 }
 
-class _ExploreState extends State<Explore> {
+class _SignalState extends State<Signal> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: AppBackground(
           child: Center(
-            child: Text("World Exploring coming soon"),
-          )),
+              child: Text("Galaxy Signals coming soon")
+          )
+      ),
       bottomNavigationBar: BottomNavigation(
-          currentIndex: 4,
+          currentIndex: 3,
           onTap: (index) {
-            if(index == 4) return;
+            if(index == 3) return;
             switch(index) {
               case 0:
                 Navigator.pushReplacementNamed(context, AppRoutes.home);
@@ -45,6 +46,5 @@ class _ExploreState extends State<Explore> {
             }
           }),
     );
-
   }
 }

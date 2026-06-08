@@ -1,31 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:orbit/routes/app_routes.dart';
-import 'package:orbit/screens/home/bottom_navigation.dart';
 import 'package:orbit/widgets/background_widget.dart';
+import 'package:orbit/screens/home/bottom_navigation.dart';
 
-class Explore extends StatefulWidget {
-  const Explore({super.key});
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
 
   @override
-  State<Explore> createState() => _ExploreState();
+  State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ExploreState extends State<Explore> {
+class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: AppBackground(
           child: Center(
-            child: Text("World Exploring coming soon"),
+            child: Text("Profile screen coming soon"),
           )),
       bottomNavigationBar: BottomNavigation(
-          currentIndex: 4,
+          currentIndex: 2,
           onTap: (index) {
-            if(index == 4) return;
-            switch(index) {
+
+            if(index == 2) return;
+
+            switch(index){
               case 0:
-                Navigator.pushReplacementNamed(context, AppRoutes.home);
-                break;
+              Navigator.pushReplacementNamed(context, AppRoutes.home);
+              break;
 
               case 1:
                 Navigator.pushReplacementNamed(context, AppRoutes.chatList);
@@ -41,10 +43,10 @@ class _ExploreState extends State<Explore> {
 
               case 4:
                 Navigator.pushReplacementNamed(context, AppRoutes.explore);
-                break;
+                break;;
             }
-          }),
+          }
+          ),
     );
-
   }
 }
