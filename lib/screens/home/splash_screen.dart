@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:orbit/providers/user_provider.dart';
 import 'package:orbit/routes/app_routes.dart';
 import 'package:orbit/services/auth_services.dart';
+import 'package:orbit/services/firestore_services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,12 +17,20 @@ class _SplashScreenState extends State<SplashScreen> {
   final AuthServices _auth = AuthServices();
 
   Future<void> checkUser() async {
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(seconds: 1),);
     await _auth.currentUser?.reload();
-
     if (!mounted) return;
+    if (_auth.isLoggedIn &&
+        _auth.isEmailVerified) {
+      final uid = FirebaseAuth.instance.currentUser!.uid;
 
-    if (_auth.isLoggedIn && _auth.isEmailVerified) {
+      final userData = await FirestoreServices().getUser(uid);
+
+      if (userData != null) {
+        context.read<UserProvider>()
+            .setUser(userData);
+      }
+      if (!mounted) return;
       Navigator.pushReplacementNamed(
         context,
         AppRoutes.home,

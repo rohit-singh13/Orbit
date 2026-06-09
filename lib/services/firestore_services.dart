@@ -11,4 +11,13 @@ class FirestoreServices {
         .doc(user.uid)
         .set(user.toMap());
   }
+
+  Future<UserModel?> getUser(String uid) async {
+    final doc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .get();
+    if(!doc.exists) return null;
+    return UserModel.fromMap(doc.data()!);
+  }
 }

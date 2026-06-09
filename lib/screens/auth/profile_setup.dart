@@ -8,6 +8,8 @@ import 'package:orbit/widgets/custom_textfield.dart';
 import 'package:orbit/utils/date_time_helper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:orbit/services/firestore_services.dart';
+import 'package:provider/provider.dart';
+import 'package:orbit/providers/user_provider.dart';
 
 
 class ProfileSetup extends StatefulWidget {
@@ -85,6 +87,7 @@ class _ProfileSetupState extends State<ProfileSetup> {
                                       createdAt: DateTime.now(),
                                     );
                                     await FirestoreServices().createUser(user);
+                                    context.read<UserProvider>().setUser(user);
                                     Navigator.pushReplacementNamed(context, AppRoutes.home);
                                   } catch (e) {
                                     ScaffoldMessenger.of(context).showSnackBar(

@@ -1,10 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:orbit/providers/user_provider.dart';
 import 'package:orbit/routes/app_routes.dart';
+import 'package:orbit/services/firestore_services.dart';
 import 'package:orbit/widgets/background_widget.dart';
 import 'package:orbit/widgets/auth_card.dart';
 import 'package:orbit/widgets/custom_button.dart';
 import 'package:orbit/widgets/custom_textfield.dart';
-import 'package:orbit/providers/auth_provider.dart';
+import 'package:orbit/providers/auth_provider.dart' as Orbit;
 import 'package:provider/provider.dart';
 
 class Login extends StatefulWidget{
@@ -22,7 +25,7 @@ class _LoginState extends State<Login>{
   bool _isHidden = true;
   @override
   Widget build(BuildContext context){
-    final authProvider = context.watch<AuthProvider>();
+    final authProvider = context.watch<Orbit.AuthProvider>();
     return Scaffold(
       body: AppBackground(
           child: Center(
@@ -97,7 +100,7 @@ class _LoginState extends State<Login>{
                                 if (!_formKey.currentState!.validate()) {
                                   return;
                                 }
-                                final provider = context.read<AuthProvider>();
+                                final provider = context.read<Orbit.AuthProvider>();
                                 await provider.signIn(email: email.text.trim(), password: password.text.trim());
                                 if(!mounted) return;
                                 if (provider.error != null) {
@@ -107,6 +110,12 @@ class _LoginState extends State<Login>{
                                     ),
                                   );
                                   return;
+                                }
+                                final uid = FirebaseAuth.instance.currentUser!.uid;
+                                final userData = await FirestoreServices().getUser(uid);
+                                if(userData != null) {
+                                  context.read<UserProvider>()
+                                      .setUser(userData);
                                 }
                                 if(provider.error == null ) {
                                   Navigator.pushNamedAndRemoveUntil(
@@ -156,7 +165,7 @@ class _LoginState extends State<Login>{
                               onPressed: authProvider.isLoading
                                 ? null
                                 : () async {
-                                final provider = context.read<AuthProvider>();
+                                final provider = context.read<Orbit.AuthProvider>();
 
                                 await provider.signInWithGoogle();
                                 if(!mounted) return;
