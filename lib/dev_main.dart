@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:orbit/screens/profile/edit_profile.dart';
 import 'package:orbit/screens/profile/profile_screen.dart';
 import 'constants/app_theme.dart';
 
@@ -19,7 +20,7 @@ class DevApp extends StatelessWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
 
-      home: const ProfileScreen(), //  change screen here
+      home: const EditProfile(), //  change screen here
     );
   }
 }

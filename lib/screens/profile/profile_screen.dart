@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:orbit/models/user_model.dart';
 import 'package:orbit/routes/app_routes.dart';
@@ -20,6 +21,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>().user;
+    final imagePath = context.watch<UserProvider>().imagePath;
     return Scaffold(
       floatingActionButton: FloatingActionButton(
           onPressed: () {
@@ -33,9 +35,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 children: [
                   CircleAvatar(
-                    backgroundColor: Colors.blue,
                     radius: 70,
-                    child: Icon(Icons.person, color: Colors.white, size: 80,),
+                    backgroundImage: imagePath != null ? FileImage(File(imagePath)) : null,
+                    child: imagePath == null ? const Icon(Icons.person, size: 80,) : null,
                   ),
                   SizedBox(height: 10,),
                   Text(user?.name ?? "Loading..."),
