@@ -20,7 +20,7 @@ class DevApp extends StatelessWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
 
-      home: const EditProfile(), //  change screen here
+      home: const ProfileScreen(), //  change screen here
     );
   }
 }

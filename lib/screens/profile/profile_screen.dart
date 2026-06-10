@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:orbit/models/user_model.dart';
 import 'package:orbit/routes/app_routes.dart';
 import 'package:orbit/widgets/background_widget.dart';
 import 'package:orbit/screens/home/bottom_navigation.dart';
 import 'package:orbit/providers/user_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:readmore/readmore.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -15,13 +15,14 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  UserModel? user;
-  String? tempBio;
+
 
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>().user;
     final imagePath = context.watch<UserProvider>().imagePath;
+    final bio = user?.bio ?? '';
+    final isLongBio = bio.length > 80;
     return Scaffold(
       floatingActionButton: FloatingActionButton(
           onPressed: () {
@@ -30,46 +31,73 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Icon(Icons.edit),
           ),
       body: AppBackground(
-          child: Center(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  CircleAvatar(
-                    radius: 70,
-                    backgroundImage: imagePath != null ? FileImage(File(imagePath)) : null,
-                    child: imagePath == null ? const Icon(Icons.person, size: 80,) : null,
-                  ),
-                  SizedBox(height: 10,),
-                  Text(user?.name ?? "Loading..."),
-                  SizedBox(height: 10,),
-                  Text("Your Bio Here"),
-                  SizedBox(height: 10,),
-                  SizedBox(
-                    width: double.infinity,
-                    child: Divider(),
-                  ),
-                  Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+          child: SafeArea(
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                          icon: const Icon(Icons.settings, size: 30,),
+                          onPressed: () {},
+                        ),
+                        ],
+                ),
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 80,
+                      backgroundImage: imagePath != null ? FileImage(File(imagePath)) : null,
+                      child: imagePath == null ? const Icon(Icons.person, size: 90,) : null,
+                    ),
+                    SizedBox(height: 15,),
+                    Text(user?.name ?? "Loading...", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),),
+                    SizedBox(height: 8,),
+                    Text("${user?.gender ?? ""} • ${user?.pronouns ?? ""}", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 15,),
+                    SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.65,
+                        child: ReadMoreText(user?.bio?.isNotEmpty == true ? user!.bio! : "Go to Edit Profile to write your Bio",
+                            style: TextStyle(fontSize: 15, height: 1.4),
+                          trimLines: 2,
+                          trimMode: TrimMode.Line,
+                          trimCollapsedText: '...see more',
+                          trimExpandedText: '\nshow less',
+                        ),
+                      ),
+                    SizedBox(height: 25,),
+                    Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _statItem("0", "Posts"),
+                          _statItem("0", "Followers"),
+                          _statItem("0", "Following")
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        _navItem(Icons.auto_awesome, "Posts", 0),
-                        SizedBox(width: 50,),
-                        _navItem(Icons.people_alt_outlined, "Followers", 1),
-                        SizedBox(width: 55,),
-                        _navItem(Icons.people, "Following", 2),
-
+                        Icon(
+                          Icons.photo_library_outlined,
+                          size: 80,
+                        ),
+                        SizedBox(height: 15),
+                        Text("No Posts Yet"),
                       ],
                     ),
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: Divider(),
-                  ),
-                  Text("Here the all the posts or videos of the user will show")
-                ],
-              ),
+                  ],
+                ),
             ),
-          )),
+            ],
+          ),
+          ),
+      ),
       bottomNavigationBar: BottomNavigation(
           currentIndex: 2,
           onTap: (index) {
@@ -97,16 +125,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
     );
   }
-  Widget _navItem(IconData icons, String label, int index ) {
-    return GestureDetector(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icons),
-          Text(label),
-          SizedBox(height: 10,)
-        ],
-      ),
+  Widget _statItem(String count, String label) {
+    return Column(
+      children: [
+        Text(count, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+        Text(label),
+      ],
     );
   }
 }

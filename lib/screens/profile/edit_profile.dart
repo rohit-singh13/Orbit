@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:orbit/providers/user_provider.dart';
+import 'package:orbit/services/firestore_services.dart';
 import 'package:orbit/services/media_picker.dart';
 import 'package:orbit/widgets/background_widget.dart';
 import 'package:orbit/widgets/custom_button.dart';
@@ -18,10 +19,22 @@ class EditProfile extends StatefulWidget {
 class _EditProfileState extends State<EditProfile> {
   TextEditingController name = TextEditingController();
   TextEditingController bio = TextEditingController();
-  TextEditingController gen = TextEditingController();
-  TextEditingController pronounce = TextEditingController();
+  String? selectedGender;
+  String? selectedPronoun;
 
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    final user = context.read<UserProvider>().user;
+    if(user != null) {
+      name.text = user.name;
+      bio.text = user.bio ?? '';
+      selectedGender = user.gender;
+      selectedPronoun = user.pronouns;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,16 +94,87 @@ class _EditProfileState extends State<EditProfile> {
                             validator: (val) => val!.isEmpty? "Bio can't be Empty" : null,
                               labelText: "Bio",
                             controller: bio,
+                            maxLines: 3,
+                            maxLength: 150,
                           ),
 
                           SizedBox(height: 10,),
 
-                          // dropdown for gender selection
-                          // dropdown for pronounce selection
+                         DropdownButtonFormField<String>(
+                           initialValue: selectedGender,
+                             decoration: const InputDecoration(
+                               labelText: "Gender",
+                             ),
+                             items: const [
+                               DropdownMenuItem(
+                                   value: "Male",
+                                   child: Text("Male")),
+                               DropdownMenuItem(
+                                 value: "Female",
+                                   child: Text("Female")),
+                               DropdownMenuItem(
+                                 value: "Other",
+                                   child: Text("Other"))
+                             ], onChanged: (value) {
+                             setState(() {
+                               selectedGender = value;
+                             });
+                         },
+                           validator: (value) => value == null ? "Please select a gender" : null,
+                         ),
+
+                          SizedBox(height: 10,),
+
+                          DropdownButtonFormField<String>(
+                            initialValue: selectedPronoun,
+                              decoration: const InputDecoration(
+                                labelText: "Pronouns"
+                              ),
+                              items: const [
+                                DropdownMenuItem(
+                                  value: "He/Him",
+                                    child: Text("He/Him")),
+                                DropdownMenuItem(
+                                  value: "She/Her",
+                                    child: Text("She/Her")),
+                                DropdownMenuItem(
+                                  value: "They/Them",
+                                    child: Text("They/Them")),
+                                DropdownMenuItem(
+                                  value: "Prefer not to say",
+                                    child: Text("Prefer Not to Say")),
+                              ], onChanged: (value) {
+                              setState(() {
+                                selectedPronoun = value;
+                              });
+                          },
+                            validator: (value) => value == null ? "Please select your pronouns" : null,
+                          ),
+
+                          SizedBox(height: 10,),
 
                           CustomButton(
                               text: "Confirm",
-                              onPressed: (){})
+                              onPressed: () async {
+                                if(!_formKey.currentState!.validate()) {
+                                  return;
+                                }
+                                final userProvider = context.read<UserProvider>();
+                                final currentUser = userProvider.user;
+                                if(currentUser == null) return;
+                                await FirestoreServices().updateUser(
+                                    currentUser.uid,
+                                    {
+                                      "name": name.text.trim(),
+                                      "bio": bio.text.trim(),
+                                      "gender": selectedGender,
+                                      "pronouns": selectedPronoun,
+                                    },
+                                );
+                                await userProvider.loadUser(currentUser.uid);
+                                if(!mounted) return;
+                                Navigator.pop(context);
+                              })
                         ],
                       ),
                     ),
@@ -104,8 +188,6 @@ class _EditProfileState extends State<EditProfile> {
   void dispose() {
     name.dispose();
     bio.dispose();
-    gen.dispose();
-    pronounce.dispose();
     super.dispose();
   }
 }
