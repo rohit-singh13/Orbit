@@ -21,8 +21,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>().user;
     final imagePath = context.watch<UserProvider>().imagePath;
-    final bio = user?.bio ?? '';
-    final isLongBio = bio.length > 80;
     return Scaffold(
       floatingActionButton: FloatingActionButton(
           onPressed: () {
@@ -48,8 +46,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     CircleAvatar(
                       radius: 80,
-                      backgroundImage: imagePath != null ? FileImage(File(imagePath)) : null,
-                      child: imagePath == null ? const Icon(Icons.person, size: 90,) : null,
+                      backgroundImage:
+                      imagePath != null
+                          ? FileImage(File(imagePath))
+                          : user?.imageUrl != null
+                          ? NetworkImage(user!.imageUrl!)
+                          : null,
+                      child: imagePath == null && user?.imageUrl == null
+                          ? const Icon(Icons.person, size: 90)
+                          : null,
                     ),
                     SizedBox(height: 15,),
                     Text(user?.name ?? "Loading...", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),),

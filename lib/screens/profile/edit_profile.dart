@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:orbit/providers/user_provider.dart';
+import 'package:orbit/services/cloudinary_service.dart';
 import 'package:orbit/services/firestore_services.dart';
 import 'package:orbit/services/media_picker.dart';
 import 'package:orbit/widgets/background_widget.dart';
@@ -162,6 +163,11 @@ class _EditProfileState extends State<EditProfile> {
                                 final userProvider = context.read<UserProvider>();
                                 final currentUser = userProvider.user;
                                 if(currentUser == null) return;
+                                final imagePath = userProvider.imagePath;
+                                String? imageUrl = currentUser.imageUrl;
+                                if(imagePath != null) {
+                                  imageUrl = await CloudinaryService().uploadImage(imagePath);
+                                }
                                 await FirestoreServices().updateUser(
                                     currentUser.uid,
                                     {
@@ -169,6 +175,7 @@ class _EditProfileState extends State<EditProfile> {
                                       "bio": bio.text.trim(),
                                       "gender": selectedGender,
                                       "pronouns": selectedPronoun,
+                                      "imageUrl": imageUrl,
                                     },
                                 );
                                 await userProvider.loadUser(currentUser.uid);
