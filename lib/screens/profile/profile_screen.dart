@@ -22,12 +22,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = context.watch<UserProvider>().user;
     final imagePath = context.watch<UserProvider>().imagePath;
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.pushNamed(context, AppRoutes.editProfile);
-          },
-        child: Icon(Icons.edit),
-          ),
       body: AppBackground(
           child: SafeArea(
             child: Column(
@@ -37,7 +31,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         children: [
                           IconButton(
                           icon: const Icon(Icons.settings, size: 30,),
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pushNamed(context, AppRoutes.settings);
+                          },
                         ),
                         ],
                 ),

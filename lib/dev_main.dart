@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:orbit/screens/profile/edit_profile.dart';
 import 'package:orbit/screens/profile/profile_screen.dart';
+import 'package:orbit/screens/settings/privacy.dart';
+import 'package:orbit/screens/settings/settings.dart';
 import 'constants/app_theme.dart';
 
 void main() {
@@ -20,7 +22,7 @@ class DevApp extends StatelessWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
 
-      home: const ProfileScreen(), //  change screen here
+      home: const Privacy(), //  change screen here
     );
   }
 }

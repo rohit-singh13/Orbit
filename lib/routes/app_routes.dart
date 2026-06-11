@@ -10,7 +10,10 @@ import 'package:orbit/screens/auth/forgot_password.dart';
 import 'package:orbit/screens/profile/edit_profile.dart';
 import 'package:orbit/screens/profile/profile_screen.dart';
 import 'package:orbit/screens/search/explore.dart';
+import 'package:orbit/screens/settings/privacy.dart';
+import 'package:orbit/screens/settings/settings.dart';
 import 'package:orbit/screens/social/signal.dart';
+import 'package:path/path.dart';
 
 class AppRoutes {
   static const intro = "/intro";
@@ -26,6 +29,8 @@ class AppRoutes {
   static const moments = "/moments-screen"; // as story
   static const explore = "/explore-screen"; // as search
   static const editProfile = "/edit-profile-screen";
+  static const settings = "/settings";
+  static const privacy = "/privacy";
 
   static Map<String, WidgetBuilder>
   routes = {
@@ -41,6 +46,8 @@ class AppRoutes {
     signal: (context) => const Signal(),
     // moments: (context) => const Moments(),
     explore: (context) => const Explore(),
-    editProfile: (context) => const EditProfile()
+    editProfile: (context) => const EditProfile(),
+    settings: (context) => const Settings(),
+    privacy: (context) => const Privacy(),
   };
 }
