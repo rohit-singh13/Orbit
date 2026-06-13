@@ -85,6 +85,9 @@ class _ProfileSetupState extends State<ProfileSetup> {
                                       name: name.text.trim(),
                                       email: FirebaseAuth.instance.currentUser!.email!,
                                       createdAt: DateTime.now(),
+                                      privateAccount: false,
+                                      friendsCount: 0,
+                                      requestsCount: 0
                                     );
                                     await FirestoreServices().createUser(user);
                                     context.read<UserProvider>().setUser(user);

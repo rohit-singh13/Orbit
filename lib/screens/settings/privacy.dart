@@ -28,7 +28,7 @@ class _PrivacyState extends State<Privacy> {
                             onPressed: () => Navigator.pop(context),
                             icon: Icon(Icons.arrow_back)),
                         Text(
-                          "Privacy",
+                          "Privacy Settings",
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w700,

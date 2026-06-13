@@ -8,6 +8,9 @@ class UserModel {
   final String? gender;
   final String? pronouns;
   final String? imageUrl;
+  final bool privateAccount;
+  final int friendsCount;
+  final int requestsCount;
   UserModel({
     required this.uid,
     required this.name,
@@ -16,7 +19,10 @@ class UserModel {
     this.bio,
     this. gender,
     this.pronouns,
-    this.imageUrl
+    this.imageUrl,
+    required this.privateAccount,
+    required this.friendsCount,
+    required this.requestsCount,
   });
   Map<String, dynamic> toMap() {
     return {
@@ -27,7 +33,10 @@ class UserModel {
       "bio": bio,
       "gender": gender,
       "pronouns": pronouns,
-      "imageUrl": imageUrl
+      "imageUrl": imageUrl,
+      "privateAccount": privateAccount,
+      "friendsCount": friendsCount,
+      "requestsCount": requestsCount,
     };
   }
 
@@ -42,7 +51,10 @@ class UserModel {
       bio: map["bio"],
       gender: map["gender"],
       pronouns: map["pronouns"],
-      imageUrl: map["imageUrl"]
+      imageUrl: map["imageUrl"],
+      privateAccount: map["privateAccount"] ?? false,
+      friendsCount: map["friendsCount"] ?? 0,
+      requestsCount: map["requestsCount"] ?? 0,
     );
   }
 }

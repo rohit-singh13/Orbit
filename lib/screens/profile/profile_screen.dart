@@ -1,6 +1,9 @@
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:orbit/providers/friend_provider.dart';
 import 'package:orbit/routes/app_routes.dart';
+import 'package:orbit/services/friend_services.dart';
 import 'package:orbit/widgets/background_widget.dart';
 import 'package:orbit/screens/home/bottom_navigation.dart';
 import 'package:orbit/providers/user_provider.dart';
@@ -91,6 +94,54 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         SizedBox(height: 15),
                         Text("No Posts Yet"),
                       ],
+                    ),
+                    // temporary code
+                    ElevatedButton(
+                      onPressed: () async {
+                        await FriendServices()
+                            .sendFriendRequest(
+                          senderId: "AgDBdfBidQRnNxYxqD9wXOIds7w1",
+                          receiverId: "tlhiZ1fu8JNJW2ie0EKbNxtr4uy2",
+                        );
+                      },
+                      child: const Text(
+                        "Send Request",
+                      ),
+                    ),
+
+                    ElevatedButton(
+                      onPressed: () async {
+
+                        await FriendServices()
+                            .acceptRequest(
+                          requestId:
+                          "XadCabX7iS7ljZiYhSUz",
+                        );
+
+                      },
+                      child: const Text(
+                        "Accept Request",
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () async {
+                        await context
+                            .read<FriendProvider>()
+                            .loadIncomingRequests(
+                          FirebaseAuth.instance.currentUser!.uid,
+                        );
+                      },
+                      child: const Text(
+                        "Load Requests",
+                      ),
+                    ),
+
+                    Consumer<FriendProvider>(
+                      builder: (context, provider, child) {
+                        return Text(
+                          "Incoming Requests: ${provider.incomingRequests.length}",
+                        );
+                      },
                     ),
                   ],
                 ),
