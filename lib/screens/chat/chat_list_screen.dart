@@ -43,7 +43,7 @@ class _ChatListState extends State<ChatList> {
                 break;
 
               case 4:
-                Navigator.pushReplacementNamed(context, AppRoutes.explore);
+                Navigator.pushReplacementNamed(context, AppRoutes.search);
                 break;
             }
           }

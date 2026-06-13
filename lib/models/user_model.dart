@@ -11,6 +11,7 @@ class UserModel {
   final bool privateAccount;
   final int friendsCount;
   final int requestsCount;
+  final String nameLower;
   UserModel({
     required this.uid,
     required this.name,
@@ -23,6 +24,7 @@ class UserModel {
     required this.privateAccount,
     required this.friendsCount,
     required this.requestsCount,
+    required this.nameLower,
   });
   Map<String, dynamic> toMap() {
     return {
@@ -37,6 +39,7 @@ class UserModel {
       "privateAccount": privateAccount,
       "friendsCount": friendsCount,
       "requestsCount": requestsCount,
+      "nameLower": name.toLowerCase(),
     };
   }
 
@@ -55,6 +58,7 @@ class UserModel {
       privateAccount: map["privateAccount"] ?? false,
       friendsCount: map["friendsCount"] ?? 0,
       requestsCount: map["requestsCount"] ?? 0,
+      nameLower: map["nameLower"],
     );
   }
 }

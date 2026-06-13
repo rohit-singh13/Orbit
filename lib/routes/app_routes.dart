@@ -12,6 +12,7 @@ import 'package:orbit/screens/auth/forgot_password.dart';
 import 'package:orbit/screens/profile/edit_profile.dart';
 import 'package:orbit/screens/profile/profile_screen.dart';
 import 'package:orbit/screens/search/explore.dart';
+import 'package:orbit/screens/search/search_screen.dart';
 import 'package:orbit/screens/settings/privacy.dart';
 import 'package:orbit/screens/settings/settings.dart';
 import 'package:orbit/screens/social/signal.dart';
@@ -33,8 +34,9 @@ class AppRoutes {
   static const editProfile = "/edit-profile-screen";
   static const settings = "/settings";
   static const privacy = "/privacy";
-  static const friendRequest = "friend-request-screen";
-  static const friendsList = "friends-List-screen";
+  static const friendRequest = "/friend-request-screen";
+  static const friendsList = "/friends-List-screen";
+  static const search = "/search";
 
   static Map<String, WidgetBuilder>
   routes = {
@@ -55,5 +57,6 @@ class AppRoutes {
     privacy: (context) => const Privacy(),
     friendRequest: (context) => const FriendRequestScreen(),
     friendsList: (context) => const FriendsScreen(),
+    search: (context) => const SearchScreen(),
   };
 }

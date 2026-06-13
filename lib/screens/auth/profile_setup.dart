@@ -83,6 +83,7 @@ class _ProfileSetupState extends State<ProfileSetup> {
                                     final user = UserModel(
                                       uid: FirebaseAuth.instance.currentUser!.uid,
                                       name: name.text.trim(),
+                                      nameLower: name.text.trim().toLowerCase(),
                                       email: FirebaseAuth.instance.currentUser!.email!,
                                       createdAt: DateTime.now(),
                                       privateAccount: false,
