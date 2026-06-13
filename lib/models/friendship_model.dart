@@ -26,8 +26,8 @@ class FriendshipModel {
       ) {
     return FriendshipModel(
       id: id,
-      userA: "userA",
-      userB: "userB",
+      userA: map["userA"],
+      userB: map["userB"],
       createdAt: (map["createdAt"] as Timestamp).toDate(),
     );
   }

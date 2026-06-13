@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:orbit/firebase/firebase_collections.dart';
 import 'package:orbit/models/friend_request_model.dart';
+import 'package:orbit/models/friendship_model.dart';
 
 class FriendServices {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -55,6 +56,18 @@ class FriendServices {
 
         final senderId = data["senderId"];
         final receiverId = data["receiverId"];
+        
+        final senderRef = _firestore.collection(FirebaseCollections.users).doc(senderId);
+        final receiveRef = _firestore.collection(FirebaseCollections.users).doc(receiverId);
+        
+        transaction.update(
+            senderRef, {
+              "friendCount": FieldValue.increment(1)
+        },);
+        
+        transaction.update(receiveRef, {
+          "friendCount": FieldValue.increment(-1)
+        });
 
         transaction.update(
           requestRef,
@@ -113,6 +126,28 @@ class FriendServices {
       return FriendRequestModel.fromMap(doc.id, doc.data());
     }).toList();
   }
+
+  Future<List<FriendshipModel>> getFriends(
+      String uid,
+      ) async {
+    final userAQuery = await _firestore
+        .collection(FirebaseCollections.friendships)
+        .where("userA", isEqualTo: uid)
+        .get();
+    final userBQuery = await _firestore
+        .collection(FirebaseCollections.friendships)
+        .where("userB", isEqualTo: uid)
+        .get();
+    final docs = [
+      ...userAQuery.docs,
+      ...userBQuery.docs
+    ];
+    return docs.map((doc) {
+      return FriendshipModel.fromMap(doc.id, doc.data());
+    }
+      ).toList();
+    }
+  }
   // sendFriendRequest();
   // sendRequest();
   // rejectRequest();
@@ -121,4 +156,3 @@ class FriendServices {
   // getIncomingRequests();
   // getOutgoingRequests();
   // getFriends();
-}

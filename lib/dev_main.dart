@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:orbit/screens/friends/friend_request_screen.dart';
 import 'package:orbit/screens/profile/edit_profile.dart';
 import 'package:orbit/screens/profile/profile_screen.dart';
 import 'package:orbit/screens/settings/privacy.dart';
@@ -22,7 +23,7 @@ class DevApp extends StatelessWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
 
-      home: const Privacy(), //  change screen here
+      home: const FriendRequestScreen(), //  change screen here
     );
   }
 }

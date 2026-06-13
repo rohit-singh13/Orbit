@@ -1,9 +1,6 @@
 import 'dart:io';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:orbit/providers/friend_provider.dart';
 import 'package:orbit/routes/app_routes.dart';
-import 'package:orbit/services/friend_services.dart';
 import 'package:orbit/widgets/background_widget.dart';
 import 'package:orbit/screens/home/bottom_navigation.dart';
 import 'package:orbit/providers/user_provider.dart';
@@ -61,23 +58,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Text("${user?.gender ?? ""} • ${user?.pronouns ?? ""}", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     SizedBox(height: 15,),
                     SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.65,
-                        child: ReadMoreText(user?.bio?.isNotEmpty == true ? user!.bio! : "Go to Edit Profile to write your Bio",
-                            style: TextStyle(fontSize: 15, height: 1.4),
-                          trimLines: 2,
-                          trimMode: TrimMode.Line,
-                          trimCollapsedText: '...see more',
-                          trimExpandedText: '\nshow less',
+                          width: MediaQuery.of(context).size.width * 0.65,
+                          child: ReadMoreText(user?.bio?.isNotEmpty == true ? user!.bio! : "Go to Edit Profile to write your Bio",
+                              style: TextStyle(fontSize: 15, height: 1.4),
+                            textAlign: TextAlign.center,
+                            trimLines: 2,
+                            trimMode: TrimMode.Line,
+                            trimCollapsedText: '...see more',
+                            trimExpandedText: '\nshow less',
+                          ),
                         ),
-                      ),
                     SizedBox(height: 25,),
                     Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           _statItem("0", "Posts"),
-                          _statItem("0", "Followers"),
-                          _statItem("0", "Following")
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(context, AppRoutes.friendsList);
+                            },
+                            child: _statItem(user?.friendsCount.toString() ?? "0", "Friends"),
+                          )
+
                         ],
                       ),
                     ),
@@ -94,54 +97,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         SizedBox(height: 15),
                         Text("No Posts Yet"),
                       ],
-                    ),
-                    // temporary code
-                    ElevatedButton(
-                      onPressed: () async {
-                        await FriendServices()
-                            .sendFriendRequest(
-                          senderId: "AgDBdfBidQRnNxYxqD9wXOIds7w1",
-                          receiverId: "tlhiZ1fu8JNJW2ie0EKbNxtr4uy2",
-                        );
-                      },
-                      child: const Text(
-                        "Send Request",
-                      ),
-                    ),
-
-                    ElevatedButton(
-                      onPressed: () async {
-
-                        await FriendServices()
-                            .acceptRequest(
-                          requestId:
-                          "XadCabX7iS7ljZiYhSUz",
-                        );
-
-                      },
-                      child: const Text(
-                        "Accept Request",
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () async {
-                        await context
-                            .read<FriendProvider>()
-                            .loadIncomingRequests(
-                          FirebaseAuth.instance.currentUser!.uid,
-                        );
-                      },
-                      child: const Text(
-                        "Load Requests",
-                      ),
-                    ),
-
-                    Consumer<FriendProvider>(
-                      builder: (context, provider, child) {
-                        return Text(
-                          "Incoming Requests: ${provider.incomingRequests.length}",
-                        );
-                      },
                     ),
                   ],
                 ),

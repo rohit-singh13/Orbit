@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:orbit/screens/auth/profile_setup.dart';
 import 'package:orbit/screens/chat/chat_list_screen.dart';
+import 'package:orbit/screens/friends/friend_request_screen.dart';
+import 'package:orbit/screens/friends/friends_screen.dart';
 import 'package:orbit/screens/home/home_screen.dart';
 import 'package:orbit/screens/home/intro_screen.dart';
 import 'package:orbit/screens/auth/login.dart';
@@ -31,6 +33,8 @@ class AppRoutes {
   static const editProfile = "/edit-profile-screen";
   static const settings = "/settings";
   static const privacy = "/privacy";
+  static const friendRequest = "friend-request-screen";
+  static const friendsList = "friends-List-screen";
 
   static Map<String, WidgetBuilder>
   routes = {
@@ -49,5 +53,7 @@ class AppRoutes {
     editProfile: (context) => const EditProfile(),
     settings: (context) => const Settings(),
     privacy: (context) => const Privacy(),
+    friendRequest: (context) => const FriendRequestScreen(),
+    friendsList: (context) => const FriendsScreen(),
   };
 }

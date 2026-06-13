@@ -3,6 +3,8 @@ import 'package:orbit/routes/app_routes.dart';
 import 'package:orbit/widgets/background_widget.dart';
 import 'package:orbit/widgets/section_title.dart';
 import 'package:orbit/widgets/setting_tile.dart';
+import 'package:orbit/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -141,7 +143,16 @@ class _SettingsState extends State<Settings> {
                         icon: Icons.logout,
                         title: "Logout",
                         iconColor: Colors.orange.shade600,
-                        onTap: () {} ),
+                        onTap: () async {
+                          await context
+                              .read<AuthProvider>()
+                              .signOut();
+                          if (!context.mounted) return;
+                          Navigator.pushReplacementNamed(
+                            context,
+                            AppRoutes.intro,
+                          );
+                        } ),
 
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 56),
