@@ -38,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 break;
 
               case 4:
-                Navigator.pushReplacementNamed(context, AppRoutes.search);
+                Navigator.pushReplacementNamed(context, AppRoutes.explore);
                 break;
             }
           }),

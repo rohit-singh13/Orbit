@@ -61,6 +61,9 @@ class _SearchScreenState extends State<SearchScreen> {
                               ),
                               title: Text(user.name),
                               subtitle: Text(user.bio ?? ""),
+                              onTap: () {
+                                Navigator.pushNamed(context, AppRoutes.userProfile, arguments: user.uid);
+                              },
                             );
                             });
                       }
@@ -90,7 +93,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 break;
 
               case 4:
-                Navigator.pushReplacementNamed(context, AppRoutes.search);
+                Navigator.pushReplacementNamed(context, AppRoutes.explore);
                 break;
             }
           }),

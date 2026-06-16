@@ -30,4 +30,20 @@ class FirestoreServices {
         .doc(uid)
         .update(data);
   }
+
+  Future<void> updatePrivacySettings({
+    required String uid,
+    required bool privateAccount,
+    required String whoCanCallMe,
+    required String whoCanMessageMe,
+}) async{
+    await _firestore
+        .collection(FirebaseCollections.users)
+        .doc(uid)
+        .update({
+      "privateAccount": privateAccount,
+      "whoCanCallMe": whoCanCallMe,
+      "whoCanMessageMe": whoCanMessageMe
+    });
+  }
 }

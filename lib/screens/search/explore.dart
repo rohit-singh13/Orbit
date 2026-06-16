@@ -15,8 +15,28 @@ class _ExploreState extends State<Explore> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: AppBackground(
-          child: Center(
-            child: Text("World Exploring coming soon"),
+          child: Column(
+            children: [
+              SizedBox(height: 20,),
+
+              SafeArea(
+                  child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: TextField(
+                      decoration: InputDecoration(
+                          hintText: "Search Orbiters...",
+                          prefixIcon: Icon(Icons.search)
+                      ),
+                      onTap: () {
+                        Navigator.pushNamed(context, AppRoutes.search);
+                      },
+                    ),
+                  ),
+              ),
+              Center(
+                child: Text("World Exploring coming soon"),
+              ),
+            ],
           )),
       bottomNavigationBar: BottomNavigation(
           currentIndex: 4,

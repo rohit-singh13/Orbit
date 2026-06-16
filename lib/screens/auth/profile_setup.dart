@@ -88,7 +88,9 @@ class _ProfileSetupState extends State<ProfileSetup> {
                                       createdAt: DateTime.now(),
                                       privateAccount: false,
                                       friendsCount: 0,
-                                      requestsCount: 0
+                                      requestsCount: 0,
+                                      whoCanCallMe: "Everyone",
+                                      whoCanMessageMe: "Everyone"
                                     );
                                     await FirestoreServices().createUser(user);
                                     context.read<UserProvider>().setUser(user);

@@ -147,12 +147,56 @@ class FriendServices {
     }
       ).toList();
     }
+
+  Future<FriendStatus> getFriendStatus({
+    required String currentUserId,
+    required String targetUserId,
+  }) async {
+    final friendshipA = await _firestore.collection(FirebaseCollections.friendships)
+        .where("userA", isEqualTo: currentUserId)
+        .where("userB", isEqualTo: targetUserId)
+        .get();
+    final friendshipB = await _firestore.collection(FirebaseCollections.friendships)
+        .where("userB", isEqualTo: currentUserId)
+        .where("userA", isEqualTo: targetUserId)
+        .get();
+    if(friendshipA.docs.isNotEmpty || friendshipB.docs.isNotEmpty) {
+      return FriendStatus.friends;
+    }
+
+    final outgoing = await _firestore
+        .collection(FirebaseCollections.friendRequests)
+        .where("senderId", isEqualTo: currentUserId)
+        .where("receiverId", isEqualTo: targetUserId)
+        .where("status", isEqualTo: "pending")
+        .get();
+
+    if (outgoing.docs.isNotEmpty) {
+      return FriendStatus.pendingOutgoing;
+    }
+
+    final incoming = await _firestore
+        .collection(FirebaseCollections.friendRequests)
+        .where("senderId", isEqualTo: targetUserId)
+        .where("receiverId", isEqualTo: currentUserId)
+        .where("status", isEqualTo: "pending")
+        .get();
+
+    if (incoming.docs.isNotEmpty) {
+      return FriendStatus.pendingIncoming;
+    }
+
+    return FriendStatus.none;
   }
-  // sendFriendRequest();
+  }
+
+enum FriendStatus {
+  none,
+  pendingOutgoing,
+  pendingIncoming,
+  friends
+}
+
+
   // sendRequest();
-  // rejectRequest();
-  // cancelRequest();
   // removeFriend();
-  // getIncomingRequests();
-  // getOutgoingRequests();
-  // getFriends();

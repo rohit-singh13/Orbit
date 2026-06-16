@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:orbit/services/firestore_services.dart';
 import 'package:orbit/widgets/background_widget.dart';
 import 'package:orbit/widgets/setting_tile.dart';
 
@@ -11,8 +13,36 @@ class Privacy extends StatefulWidget {
 
 class _PrivacyState extends State<Privacy> {
   bool isPrivateAccount = false;
-  String whoCanAddMe = "Everyone";
+  String whoCanCallMe = "Everyone";
   String whoCanMessageMe = "Everyone";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPrivacySettings();
+  }
+
+  Future<void> _loadPrivacySettings() async {
+    final user = await FirestoreServices()
+        .getUser(FirebaseAuth.instance.currentUser!.uid);
+
+    if (user == null) return;
+
+    setState(() {
+      isPrivateAccount = user.privateAccount;
+      whoCanCallMe = user.whoCanCallMe;
+      whoCanMessageMe = user.whoCanMessageMe;
+    });
+  }
+  Future<void> _savePrivacySettings() async {
+    await FirestoreServices().updatePrivacySettings(
+      uid: FirebaseAuth.instance.currentUser!.uid,
+      privateAccount: isPrivateAccount,
+      whoCanCallMe: whoCanCallMe,
+      whoCanMessageMe: whoCanMessageMe,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,15 +79,15 @@ class _PrivacyState extends State<Privacy> {
                         scale: 0.75,
                         child: Switch(
                           value: isPrivateAccount,
-                          onChanged: (value) {
+                          onChanged: (value) async {
                             setState(() {
                               isPrivateAccount = value;
                             });
+                            await _savePrivacySettings();
                           },
                         ),
                       ),
-                      onTap: () {},
-                    ), // here a switch
+                    ),
 
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 56),
@@ -69,34 +99,42 @@ class _PrivacyState extends State<Privacy> {
 
                     SettingsTile(
                         icon: Icons.person_add_rounded,
-                        title: "Who can add me",
+                        title: "Who can call me",
                         iconColor: Colors.blue.shade400,
-                        onTap: () {
+                        onTap: () async {
                           showModalBottomSheet(
                             context: context,
-                            builder: (context) {
+                            builder: (sheetContext) {
                               return Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   ListTile(
                                     title: const Text("Everyone"),
-                                    onTap: () {
-                                      setState(() => whoCanAddMe = "Everyone");
-                                      Navigator.pop(context);
+                                    onTap: () async {
+                                      setState(() => whoCanCallMe = "Everyone");
+                                      await _savePrivacySettings();
+                                      Navigator.pop(sheetContext);
                                     },
                                   ),
                                   ListTile(
-                                    title: const Text("Friends of Friends"),
-                                    onTap: () {
-                                      setState(() => whoCanAddMe = "Friends of Friends");
-                                      Navigator.pop(context);
+                                    title: const Text("Friends"),
+                                    onTap: () async {
+                                      setState(() => whoCanCallMe = "Friends");
+                                      await FirestoreServices().updatePrivacySettings(
+                                          uid: FirebaseAuth.instance.currentUser!.uid,
+                                          privateAccount: isPrivateAccount,
+                                          whoCanCallMe: whoCanCallMe,
+                                          whoCanMessageMe: whoCanMessageMe
+                                      );
+                                      Navigator.pop(sheetContext);
                                     },
                                   ),
                                   ListTile(
                                     title: const Text("Nobody"),
-                                    onTap: () {
-                                      setState(() => whoCanAddMe = "Nobody");
-                                      Navigator.pop(context);
+                                    onTap: () async {
+                                      setState(() => whoCanCallMe = "Nobody");
+                                      await _savePrivacySettings();
+                                      Navigator.pop(sheetContext);
                                     },
                                   ),
                                 ],
@@ -104,7 +142,7 @@ class _PrivacyState extends State<Privacy> {
                             },
                           );
                         },
-                      trailing: Text(whoCanAddMe),
+                      trailing: Text(whoCanCallMe),
                         ),
 
                     const Padding(
@@ -119,32 +157,35 @@ class _PrivacyState extends State<Privacy> {
                         icon: Icons.message,
                         title: "Who can message me",
                         iconColor: Colors.indigo.shade400,
-                        onTap: () {
+                        onTap: () async {
                           showModalBottomSheet(
                             context: context,
-                            builder: (context) {
+                            builder: (sheetContext) {
                               return Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   ListTile(
                                     title: const Text("Everyone"),
-                                    onTap: () {
+                                    onTap: () async {
                                       setState(() => whoCanMessageMe = "Everyone");
-                                      Navigator.pop(context);
+                                      await _savePrivacySettings();
+                                      Navigator.pop(sheetContext);
                                     },
                                   ),
                                   ListTile(
                                     title: const Text("Friends"),
-                                    onTap: () {
+                                    onTap: () async {
                                       setState(() => whoCanMessageMe = "Friends");
-                                      Navigator.pop(context);
+                                      await _savePrivacySettings();
+                                      Navigator.pop(sheetContext);
                                     },
                                   ),
                                   ListTile(
                                     title: const Text("Nobody"),
-                                    onTap: () {
+                                    onTap: () async {
                                       setState(() => whoCanMessageMe = "Nobody");
-                                      Navigator.pop(context);
+                                      await _savePrivacySettings();
+                                      Navigator.pop(sheetContext);
                                     },
                                   ),
                                 ],

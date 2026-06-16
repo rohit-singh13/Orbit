@@ -125,7 +125,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Navigator.pushReplacementNamed(context, AppRoutes.signal);
                 break;
               case 4:
-                Navigator.pushReplacementNamed(context, AppRoutes.search);
+                Navigator.pushReplacementNamed(context, AppRoutes.explore);
                 break;
             }
           }
