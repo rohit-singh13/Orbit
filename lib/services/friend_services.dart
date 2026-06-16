@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:orbit/firebase/firebase_collections.dart';
 import 'package:orbit/models/friend_request_model.dart';
 import 'package:orbit/models/friendship_model.dart';
@@ -34,6 +35,32 @@ class FriendServices {
 
   }
 
+  Future<String?> getRequestId({
+    required String currentUserId,
+    required String targetUserId
+}) async {
+    final outgoing = await _firestore
+        .collection(FirebaseCollections.friendRequests)
+        .where("senderId", isEqualTo: currentUserId)
+        .where("receiverId", isEqualTo: targetUserId)
+        .where("status", isEqualTo: "pending")
+        .get();
+    if(outgoing.docs.isNotEmpty) {
+      return outgoing.docs.first.id;
+    }
+    final incoming = await _firestore
+        .collection(FirebaseCollections.friendRequests)
+        .where("senderId", isEqualTo: targetUserId)
+        .where("receiverId", isEqualTo: currentUserId)
+        .where("status", isEqualTo: "pending")
+        .get();
+    if(incoming.docs.isNotEmpty) {
+      return incoming.docs.first.id;
+    }
+    return null;
+  }
+
+
   Future<void> acceptRequest({
     required String requestId,
   }) async {
@@ -62,11 +89,11 @@ class FriendServices {
         
         transaction.update(
             senderRef, {
-              "friendCount": FieldValue.increment(1)
+              "friendsCount": FieldValue.increment(1)
         },);
         
         transaction.update(receiveRef, {
-          "friendCount": FieldValue.increment(-1)
+          "friendsCount": FieldValue.increment(1)
         });
 
         transaction.update(
@@ -90,6 +117,40 @@ class FriendServices {
         );
       },
     );
+  }
+
+  Future<void> removeFriend({
+    required String currentUserId,
+    required String targetUserId
+}) async {
+    final friendshipA = await _firestore
+        .collection(FirebaseCollections.friendships)
+        .where("userA", isEqualTo: currentUserId)
+        .where("userB", isEqualTo: targetUserId)
+        .get();
+    final friendshipB = await _firestore
+        .collection(FirebaseCollections.friendships)
+        .where("userA", isEqualTo: targetUserId)
+        .where("userB", isEqualTo: currentUserId)
+        .get();
+    final friendshipDoc = friendshipA.docs.isNotEmpty ? friendshipA.docs.first : friendshipB.docs.first;
+    await _firestore.runTransaction((transaction) async {
+      final currentUserRef = _firestore
+          .collection(FirebaseCollections.users)
+          .doc(currentUserId);
+      final targetUserRef = _firestore
+          .collection(FirebaseCollections.users)
+          .doc(targetUserId);
+      transaction.update(
+          currentUserRef,{
+            "friendsCount": FieldValue.increment(-1)
+      });
+      transaction.update(
+          targetUserRef, {
+            "friendsCount": FieldValue.increment(-1)
+          });
+      transaction.delete(friendshipDoc.reference);
+    });
   }
 
   Future<void> rejectRequest({
@@ -188,6 +249,7 @@ class FriendServices {
 
     return FriendStatus.none;
   }
+
   }
 
 enum FriendStatus {

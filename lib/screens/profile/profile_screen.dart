@@ -16,7 +16,6 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
 
-
   @override
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>().user;
@@ -27,8 +26,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Column(
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          IconButton(
+                              onPressed: () {
+                                Navigator.pushNamed(context, AppRoutes.friendRequest);
+                              }, icon: Icon(Icons.notifications, size: 30,)),
                           IconButton(
                           icon: const Icon(Icons.settings, size: 30,),
                           onPressed: () {
@@ -109,7 +112,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           currentIndex: 2,
           onTap: (index) {
 
-            if(index == 2) return;
+            if(index == 2) {
+              context.read<UserProvider>().refreshUser();
+              return;
+            }
 
             switch(index){
               case 0:

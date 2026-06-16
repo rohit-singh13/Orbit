@@ -18,6 +18,22 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   bool _isLoaded = false;
   Future<UserModel?>? _userFuture;
   Future<FriendStatus>? _friendStatusFuture;
+  Future<String?>? _requestIdFuture;
+  void _refreshRelationship(UserModel user) {
+    setState(() {
+      _userFuture = FirestoreServices().getUser(user.uid);
+
+      _friendStatusFuture = FriendServices().getFriendStatus(
+        currentUserId: FirebaseAuth.instance.currentUser!.uid,
+        targetUserId: user.uid,
+      );
+
+      _requestIdFuture = FriendServices().getRequestId(
+        currentUserId: FirebaseAuth.instance.currentUser!.uid,
+        targetUserId: user.uid,
+      );
+    });
+  }
 
   @override
   void didChangeDependencies() {
@@ -26,6 +42,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     final uid = ModalRoute.of(context)!.settings.arguments as String;
     _userFuture = FirestoreServices().getUser(uid);
     _friendStatusFuture = FriendServices().getFriendStatus(currentUserId: FirebaseAuth.instance.currentUser!.uid, targetUserId: uid);
+    _requestIdFuture = FriendServices().getRequestId(currentUserId: FirebaseAuth.instance.currentUser!.uid, targetUserId: uid);
     _isLoaded = true;
   }
   @override
@@ -94,87 +111,132 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             FutureBuilder<FriendStatus>(
                                 future: _friendStatusFuture,
                                 builder: ((context, snapshot) {
-                                  if(!snapshot.hasData) {
+                                  if (!snapshot.hasData) {
                                     return const CircularProgressIndicator();
                                   }
                                   final status = snapshot.data!;
-                                  final canViewPosts = !user.privateAccount || status == FriendStatus.friends;
-                                  return Column(
-                                    children: [
-                                      switch(status) {
-                                      FriendStatus.none =>
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              ElevatedButton(
-                                                  onPressed: () {},
-                                                  child: Text("Add Friend")),
-                                              ElevatedButton(
-                                                  onPressed: () {},
-                                                  child: Text("Request Message"))
-                                            ],
-                                          ),
-                                      FriendStatus.pendingIncoming =>
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              ElevatedButton(
-                                                  onPressed: () {},
-                                                  child: Text("Accept")),
-                                              ElevatedButton(
-                                                  onPressed: () {},
-                                                  child: Text("Reject"))
-                                            ],
-                                          ),
-                                      FriendStatus.pendingOutgoing =>
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              ElevatedButton(
-                                                  onPressed: null,
-                                                  child: Text("Request Sent")),
-                                              ElevatedButton(
-                                                  onPressed: () {},
-                                                  child: Text("Cancel Request"))
-                                            ],
-                                          ),
-                                      FriendStatus.friends =>
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              ElevatedButton(
-                                                  onPressed: () {},
-                                                  child: Text("Message")),
-                                              ElevatedButton(
-                                                  onPressed: () {},
-                                                  child: Text("Remove Friend"))
-                                            ],
-                                          )
-                                      },
-                                      SizedBox(height: 20,),
-                                      if (!canViewPosts)
-                                        Column(
+                                  final canViewPosts = !user.privateAccount ||
+                                      status == FriendStatus.friends;
+                                  return FutureBuilder(future: _requestIdFuture,
+                                      builder: (context, requestSnapshot) {
+                                    if(requestSnapshot.connectionState == ConnectionState.waiting){
+                                      return const CircularProgressIndicator();
+                                    }
+                                        final requestId = requestSnapshot.data;
+                                        return Column(
                                           children: [
-                                            Icon(Icons.lock, size: 40,),
-                                            SizedBox(height: 10,),
-                                            Text("This account is private")
+                                            switch(status) {
+                                              FriendStatus.none =>
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment
+                                                        .spaceEvenly,
+                                                    children: [
+                                                      ElevatedButton(
+                                                          onPressed: () async {
+                                                            await FriendServices()
+                                                                .sendFriendRequest(
+                                                                senderId: FirebaseAuth.instance.currentUser!.uid,
+                                                                receiverId: user.uid);
+                                                            _refreshRelationship(user);
+                                                          },
+                                                          child: Text(
+                                                              "Add Friend")),
+                                                      ElevatedButton(
+                                                          onPressed: () {},
+                                                          child: Text(
+                                                              "Request Message"))
+                                                    ],
+                                                  ),
+                                              FriendStatus.pendingIncoming =>
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment
+                                                        .spaceEvenly,
+                                                    children: [
+                                                      ElevatedButton(
+                                                          onPressed: () async {
+                                                            await FriendServices()
+                                                                .acceptRequest(
+                                                                requestId: requestId!);
+                                                            _refreshRelationship(user);
+                                                          },
+                                                          child: Text(
+                                                              "Accept")),
+                                                      ElevatedButton(
+                                                          onPressed: () async {
+                                                            await FriendServices()
+                                                                .rejectRequest(
+                                                                requestId: requestId!);
+                                                            _refreshRelationship(user);
+                                                          },
+                                                          child: Text("Reject"))
+                                                    ],
+                                                  ),
+                                              FriendStatus.pendingOutgoing =>
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment
+                                                        .spaceEvenly,
+                                                    children: [
+                                                      ElevatedButton(
+                                                          onPressed: null,
+                                                          child: Text(
+                                                              "Request Sent")),
+                                                      ElevatedButton(
+                                                          onPressed: () async {
+                                                            await FriendServices()
+                                                                .cancelRequest(
+                                                                requestId: requestId!);
+                                                            _refreshRelationship(user);
+                                                          },
+                                                          child: Text(
+                                                              "Cancel Request"))
+                                                    ],
+                                                  ),
+                                              FriendStatus.friends =>
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment
+                                                        .spaceEvenly,
+                                                    children: [
+                                                      ElevatedButton(
+                                                          onPressed: () {},
+                                                          child: Text(
+                                                              "Message")),
+                                                      ElevatedButton(
+                                                          onPressed: () async {
+                                                            await FriendServices()
+                                                                .removeFriend(
+                                                                currentUserId: FirebaseAuth.instance.currentUser!.uid,
+                                                                targetUserId: user.uid
+                                                            );
+                                                            _refreshRelationship(user);
+                                                          },
+                                                          child: Text(
+                                                              "Remove Friend"))
+                                                    ],
+                                                  )
+                                            },
+                                            SizedBox(height: 20,),
+                                            if (!canViewPosts)
+                                              Column(
+                                                children: [
+                                                  Icon(Icons.lock, size: 40,),
+                                                  SizedBox(height: 10,),
+                                                  Text(
+                                                      "This account is private")
+                                                ],
+                                              )
+                                            else
+                                              Column(
+                                                children: [
+                                                  Text("No posts yet")
+                                                ],
+                                              )
                                           ],
-                                        )
-                                      else
-                                        Column(
-                                          children: [
-                                            Text("No posts yet")
-                                          ],
-                                        )
-                                    ],
+                                        );
+                                      }
                                   );
-                                  
-
-                                }),
-
+                                }
                             ),
-
-
+                            )
                           ],
                         ),
                       ),

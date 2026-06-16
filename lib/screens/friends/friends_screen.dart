@@ -32,17 +32,17 @@ class _FriendsScreenState extends State<FriendsScreen>{
       body: AppBackground(
         child: Consumer<FriendProvider>(
             builder: (context, provider, child) {
+              if (provider.friends.isEmpty) {
+                return const Center(
+                  child: Text(
+                    "No friends yet",
+                  ),
+                );
+              }
               return ListView.builder(
                 itemCount: provider.friends.length,
                   itemBuilder: (context, index) {
                   final friend = provider.friends[index];
-                  if (provider.friends.isEmpty) {
-                    return const Center(
-                      child: Text(
-                        "No friends yet",
-                      ),
-                    );
-                  }
                   return ListTile(
                     leading: CircleAvatar(
                       backgroundImage: friend.imageUrl != null ? NetworkImage(friend.imageUrl!) : null,

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:orbit/models/user_model.dart';
 import 'package:orbit/services/firestore_services.dart';
@@ -11,6 +12,11 @@ class UserProvider extends ChangeNotifier{
   String? get imagePath => _imagePath;
   final FirestoreServices _firestoreServices = FirestoreServices();
   Future<void> loadUser(String uid) async {
+    _user = await _firestoreServices.getUser(uid);
+    notifyListeners();
+  }
+  Future<void> refreshUser() async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
     _user = await _firestoreServices.getUser(uid);
     notifyListeners();
   }
