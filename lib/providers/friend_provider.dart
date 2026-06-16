@@ -29,6 +29,7 @@ class FriendProvider extends ChangeNotifier{
       ) async {
     await _friendServices.acceptRequest(requestId: requestId);
     await loadIncomingRequests(uid);
+    notifyListeners();
   }
 
   Future<void> rejectRequest(
@@ -37,6 +38,7 @@ class FriendProvider extends ChangeNotifier{
       ) async {
     await _friendServices.rejectRequest(requestId: requestId);
     await loadIncomingRequests(uid);
+    notifyListeners();
   }
 
   Future<void> loadFriends(

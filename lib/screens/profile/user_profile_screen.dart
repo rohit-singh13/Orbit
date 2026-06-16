@@ -16,6 +16,7 @@ class UserProfileScreen extends StatefulWidget {
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
   bool _isLoaded = false;
+  String? _loadingAction;
   Future<UserModel?>? _userFuture;
   Future<FriendStatus>? _friendStatusFuture;
   Future<String?>? _requestIdFuture;
@@ -132,15 +133,26 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                                         .spaceEvenly,
                                                     children: [
                                                       ElevatedButton(
-                                                          onPressed: () async {
-                                                            await FriendServices()
-                                                                .sendFriendRequest(
-                                                                senderId: FirebaseAuth.instance.currentUser!.uid,
-                                                                receiverId: user.uid);
-                                                            _refreshRelationship(user);
+                                                          onPressed: _loadingAction != null ? null : () async {
+                                                            setState(() {
+                                                              _loadingAction = "send";
+                                                            });
+                                                            try {
+                                                              await FriendServices().sendFriendRequest(
+                                                                  senderId: FirebaseAuth.instance.currentUser!.uid,
+                                                                  receiverId: user.uid);
+                                                              _refreshRelationship(user);
+                                                            } finally {
+                                                              setState(() {
+                                                                _loadingAction = null;
+                                                              });
+                                                            }
                                                           },
-                                                          child: Text(
-                                                              "Add Friend")),
+                                                          child: _loadingAction == "send" ? SizedBox(
+                                                            height: 18,
+                                                            width: 18,
+                                                            child: CircularProgressIndicator( strokeWidth: 2,),
+                                                          ) : const Text("Add Friend")),
                                                       ElevatedButton(
                                                           onPressed: () {},
                                                           child: Text(
@@ -153,22 +165,48 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                                         .spaceEvenly,
                                                     children: [
                                                       ElevatedButton(
-                                                          onPressed: () async {
-                                                            await FriendServices()
-                                                                .acceptRequest(
-                                                                requestId: requestId!);
-                                                            _refreshRelationship(user);
+                                                          onPressed: _loadingAction != null ? null : () async {
+                                                            setState(() {
+                                                              _loadingAction = "accept";
+                                                            });
+                                                            try {
+                                                              await FriendServices().acceptRequest(
+                                                                  requestId: requestId!);
+                                                              _refreshRelationship(user);
+                                                            } finally {
+                                                              setState(() {
+                                                                _loadingAction = null;
+                                                              });
+                                                            }
                                                           },
-                                                          child: Text(
-                                                              "Accept")),
+                                                          child: _loadingAction == "accept" ? const SizedBox(
+                                                            height: 18, width: 18,
+                                                            child: CircularProgressIndicator(
+                                                              strokeWidth: 2,
+                                                            ),
+                                                          ) : const Text("Accept")),
                                                       ElevatedButton(
-                                                          onPressed: () async {
-                                                            await FriendServices()
-                                                                .rejectRequest(
-                                                                requestId: requestId!);
-                                                            _refreshRelationship(user);
+                                                          onPressed: _loadingAction != null ? null : () async {
+                                                            setState(() {
+                                                              _loadingAction = "reject";
+                                                            });
+                                                            try {
+                                                              await FriendServices()
+                                                                  .rejectRequest(
+                                                                  requestId: requestId!);
+                                                              _refreshRelationship(user);
+                                                            } finally {
+                                                              setState(() {
+                                                                _loadingAction = null;
+                                                              });
+                                                            }
                                                           },
-                                                          child: Text("Reject"))
+                                                          child: _loadingAction == "reject" ? const SizedBox(
+                                                            height: 18, width: 18,
+                                                            child: CircularProgressIndicator(
+                                                              strokeWidth: 2,
+                                                            ),
+                                                          ) : Text("Reject"))
                                                     ],
                                                   ),
                                               FriendStatus.pendingOutgoing =>
@@ -181,14 +219,26 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                                           child: Text(
                                                               "Request Sent")),
                                                       ElevatedButton(
-                                                          onPressed: () async {
-                                                            await FriendServices()
-                                                                .cancelRequest(
-                                                                requestId: requestId!);
-                                                            _refreshRelationship(user);
+                                                          onPressed: _loadingAction != null ? null : () async {
+                                                            setState(() {
+                                                              _loadingAction = "cancel";
+                                                            });
+                                                            try {
+                                                              await FriendServices().cancelRequest(
+                                                                  requestId: requestId!);
+                                                              _refreshRelationship(user);
+                                                            } finally {
+                                                              setState(() {
+                                                                _loadingAction = null;
+                                                              });
+                                                            }
                                                           },
-                                                          child: Text(
-                                                              "Cancel Request"))
+                                                          child: _loadingAction == "cancel" ? const SizedBox(
+                                                            height: 18, width: 18,
+                                                            child: CircularProgressIndicator(
+                                                              strokeWidth: 2,
+                                                            ),
+                                                          ) :  Text("Cancel Request"))
                                                     ],
                                                   ),
                                               FriendStatus.friends =>
@@ -201,16 +251,29 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                                           child: Text(
                                                               "Message")),
                                                       ElevatedButton(
-                                                          onPressed: () async {
-                                                            await FriendServices()
-                                                                .removeFriend(
-                                                                currentUserId: FirebaseAuth.instance.currentUser!.uid,
-                                                                targetUserId: user.uid
-                                                            );
-                                                            _refreshRelationship(user);
+                                                          onPressed: _loadingAction != null ? null : () async {
+                                                            setState(() {
+                                                              _loadingAction = "remove";
+                                                            });
+                                                            try {
+                                                              await FriendServices()
+                                                                  .removeFriend(
+                                                                  currentUserId: FirebaseAuth.instance.currentUser!.uid,
+                                                                  targetUserId: user.uid
+                                                              );
+                                                              _refreshRelationship(user);
+                                                            } finally {
+                                                              setState(() {
+                                                                _loadingAction = null;
+                                                              });
+                                                            }
                                                           },
-                                                          child: Text(
-                                                              "Remove Friend"))
+                                                          child: _loadingAction == "remove" ? const SizedBox(
+                                                            height: 18, width: 18,
+                                                            child: CircularProgressIndicator(
+                                                              strokeWidth: 2,
+                                                            ),
+                                                          ) : Text("Remove Friend"))
                                                     ],
                                                   )
                                             },

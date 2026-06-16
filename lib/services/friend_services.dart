@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:orbit/firebase/firebase_collections.dart';
 import 'package:orbit/models/friend_request_model.dart';
 import 'package:orbit/models/friendship_model.dart';
@@ -142,9 +141,9 @@ class FriendServices {
           .collection(FirebaseCollections.users)
           .doc(targetUserId);
       transaction.update(
-          currentUserRef,{
+           currentUserRef,{
             "friendsCount": FieldValue.increment(-1)
-      });
+        });
       transaction.update(
           targetUserRef, {
             "friendsCount": FieldValue.increment(-1)
