@@ -27,8 +27,8 @@ class _SplashScreenState extends State<SplashScreen> {
       final userData = await FirestoreServices().getUser(uid);
 
       if (userData != null) {
-        context.read<UserProvider>()
-            .setUser(userData);
+        context.read<UserProvider>().setUser(userData);
+        context.read<UserProvider>().loadLocalImage(uid);
       }
       if (!mounted) return;
       Navigator.pushReplacementNamed(
@@ -46,7 +46,6 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<UserProvider>().loadLocalImage();
     checkUser();
   }
 

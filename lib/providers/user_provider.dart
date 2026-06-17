@@ -28,8 +28,22 @@ class UserProvider extends ChangeNotifier{
     _imagePath = path;
     notifyListeners();
   }
-  void loadLocalImage() {
-    _imagePath = HiveService.getProfileImagePath();
+  void loadLocalImage(String uid) {
+    _imagePath = HiveService.getProfileImagePath(uid);
+    notifyListeners();
+  }
+
+  Future<void> saveLocalImage(
+      String uid,
+      String path
+      ) async {
+    await HiveService.saveProfileImagePath(uid, path);
+    _imagePath = path;
+    notifyListeners();
+  }
+  void clearUser() {
+    _user = null;
+    _imagePath = null;
     notifyListeners();
   }
 }

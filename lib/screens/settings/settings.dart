@@ -5,6 +5,7 @@ import 'package:orbit/widgets/section_title.dart';
 import 'package:orbit/widgets/setting_tile.dart';
 import 'package:orbit/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:orbit/providers/user_provider.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -148,6 +149,7 @@ class _SettingsState extends State<Settings> {
                               .read<AuthProvider>()
                               .signOut();
                           if (!context.mounted) return;
+                          context.read<UserProvider>().clearUser();
                           Navigator.pushReplacementNamed(
                             context,
                             AppRoutes.intro,

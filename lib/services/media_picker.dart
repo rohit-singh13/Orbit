@@ -9,7 +9,10 @@ class MediaPicker {
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
     if(image != null) {
-      await HiveService.saveProfileImagePath(image.path);
+      await HiveService.saveProfileImagePath(
+        userProvider.user!.uid,
+        image.path
+      );
       userProvider.setImagePath(image.path);
     }
   }
