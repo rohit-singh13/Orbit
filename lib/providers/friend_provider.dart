@@ -62,6 +62,12 @@ class FriendProvider extends ChangeNotifier{
     _friends = loadedFriends;
     notifyListeners();
   }
+
+  void clearFriends() {
+    _friends.clear();
+    _incomingRequests.clear();
+    notifyListeners();
+  }
   // List<FriendRequestModel> incomingRequests;
   // List<FriendRequestModel> outgoingRequests;
   // List<UserModel> friends;

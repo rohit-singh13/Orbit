@@ -1,6 +1,8 @@
+import 'package:orbit/providers/user_provider.dart';
 import 'package:orbit/services/auth_services.dart';
 import 'package:flutter/material.dart';
 import 'package:orbit/services/hive_service.dart';
+import 'package:path/path.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthServices _authServices = AuthServices();
@@ -105,7 +107,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> signOut() async {
-    await HiveService.userBox.delete('profileImagePath');
+    await HiveService.userBox.clear();
     await _authServices.signOut();
     notifyListeners();
   }

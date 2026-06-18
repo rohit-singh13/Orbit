@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:orbit/screens/auth/profile_setup.dart';
 import 'package:orbit/screens/chat/chat_list_screen.dart';
+import 'package:orbit/screens/chat/personal_chat_screen.dart';
 import 'package:orbit/screens/friends/friend_request_screen.dart';
 import 'package:orbit/screens/friends/friends_screen.dart';
 import 'package:orbit/screens/home/home_screen.dart';
@@ -39,6 +40,7 @@ class AppRoutes {
   static const friendsList = "/friends-List-screen";
   static const search = "/search";
   static const userProfile = "/user-Profile";
+  static const personalChat = "/personal-chat";
 
   static Map<String, WidgetBuilder>
   routes = {
@@ -61,5 +63,10 @@ class AppRoutes {
     friendsList: (context) => const FriendsScreen(),
     search: (context) => const SearchScreen(),
     userProfile: (context) => const UserProfileScreen(),
+    personalChat: (context) {
+      final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+      return PersonalChatScreen(receiverId: args['receiverId'], receiverName: args['receiverName'], receiverImageUrl: args['receiverImageUrl'],);
+    },
+
   };
 }

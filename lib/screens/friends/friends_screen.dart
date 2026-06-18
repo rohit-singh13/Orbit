@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:orbit/providers/friend_provider.dart';
+import 'package:orbit/routes/app_routes.dart';
 import 'package:orbit/widgets/background_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -49,6 +50,16 @@ class _FriendsScreenState extends State<FriendsScreen>{
                     ),
                     title: Text(friend.name),
                     subtitle: Text(friend.bio ?? "No bio yet"),
+                    trailing: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushNamed(
+                              context, 
+                              AppRoutes.personalChat, arguments: {
+                                'receiverId': friend.uid, 
+                                'receiverName': friend.name,
+                                'receiverImageUrl': friend.imageUrl
+                          });
+                        }, child: Text("Message")),
                   );
                   }
               );

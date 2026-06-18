@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:orbit/routes/app_routes.dart';
+import 'package:orbit/services/chat_services.dart';
 import 'package:orbit/widgets/background_widget.dart';
 import 'package:orbit/screens/home/bottom_navigation.dart';
 class HomeScreen extends StatefulWidget {
@@ -15,7 +16,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: AppBackground(
           child: Center(
-              child: Text("Welcome to the Orbit", style: TextStyle(fontSize: 20),))),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Welcome to the Orbit", style: TextStyle(fontSize: 20),),
+                ],
+              ))),
       bottomNavigationBar: BottomNavigation(
           currentIndex: 0,
           onTap: (index) {

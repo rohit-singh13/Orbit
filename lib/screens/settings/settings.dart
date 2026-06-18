@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:orbit/providers/chat_provider.dart';
+import 'package:orbit/providers/search_provider.dart';
 import 'package:orbit/routes/app_routes.dart';
 import 'package:orbit/widgets/background_widget.dart';
 import 'package:orbit/widgets/section_title.dart';
@@ -145,14 +147,16 @@ class _SettingsState extends State<Settings> {
                         title: "Logout",
                         iconColor: Colors.orange.shade600,
                         onTap: () async {
-                          await context
-                              .read<AuthProvider>()
-                              .signOut();
+                          context.read<UserProvider>().clearUser();
+                          context.read<SearchProvider>().clearSearch();
+                          context.read<ChatProvider>().clearChat();
+                          await context.read<AuthProvider>().signOut();
                           if (!context.mounted) return;
                           context.read<UserProvider>().clearUser();
-                          Navigator.pushReplacementNamed(
+                          Navigator.pushNamedAndRemoveUntil(
                             context,
                             AppRoutes.intro,
+                              (route) => false
                           );
                         } ),
 
