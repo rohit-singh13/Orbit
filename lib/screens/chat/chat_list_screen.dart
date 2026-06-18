@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:orbit/providers/chat_provider.dart';
 import 'package:orbit/routes/app_routes.dart';
 import 'package:orbit/widgets/background_widget.dart';
 import 'package:orbit/screens/home/bottom_navigation.dart';
+import 'package:orbit/widgets/chat_tile.dart';
+import 'package:provider/provider.dart';
 
 class ChatList extends StatefulWidget {
   const ChatList({super.key});
@@ -11,13 +14,41 @@ class ChatList extends StatefulWidget {
 }
 
 class _ChatListState extends State<ChatList> {
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      context.read<ChatProvider>().listenChats();
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Messages"),
+      ),
       body: AppBackground(
-          child: Center(
-            child: Text("Chat List coming soon"),
-          )),
+        child: Consumer<ChatProvider>(
+            builder: (context, provider, child) {
+              if(provider.chats.isEmpty) {
+                return const Center(
+                  child: Text("No chats yet"),
+                );
+              }
+
+              return ListView.builder(
+                itemCount: provider.chats.length,
+                  itemBuilder: (context, index) {
+                  final chat = provider.chats[index];
+                  return ChatTile(
+                      chat: chat,
+                      onTap: () {}
+                  );
+                  });
+            }
+        ),
+          ),
       bottomNavigationBar: BottomNavigation(
           currentIndex: 1,
           onTap: (index) {

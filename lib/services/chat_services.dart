@@ -75,6 +75,40 @@ class ChatServices {
     });
   }
 
+  Future<void> markChatAsRead(String otherUserId) async {
+    final currentUid = _auth.currentUser!.uid;
+    final chatId = getChatId(currentUid, otherUserId);
+    await _firestore
+        .collection(FirebaseCollections.chats)
+        .doc(chatId)
+        .update({'unreadCounts.$currentUid': 0});
+  }
+
+  Future<void> markMessagesAsRead(
+      String otherUserId
+      ) async {
+    final currentUid = _auth.currentUser!.uid;
+    final chatId = getChatId(currentUid, otherUserId);
+    final messages = await _firestore
+        .collection(FirebaseCollections.chats)
+        .doc(chatId)
+        .collection(FirebaseCollections.messages)
+        .where('senderId', isEqualTo: otherUserId)
+        .get();
+
+    final batch = _firestore.batch();
+    for(final doc in messages.docs) {
+      final readBy = List<String>.from(doc.data()['readBy'] ?? []);
+      if(!readBy.contains(currentUid)) {
+        batch.update(doc.reference, {
+          'readBy': FieldValue.arrayUnion([currentUid])
+        }
+        );
+      }
+    }
+    await batch.commit();
+  }
+
   Stream<List<MessageModel>> streamMessages(String otherUserId,) {
     final currentUid = _auth.currentUser!.uid;
     final chatId = getChatId(currentUid, otherUserId);
