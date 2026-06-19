@@ -14,6 +14,8 @@ class UserModel {
   final String nameLower;
   final String whoCanCallMe;
   final String whoCanMessageMe;
+  final bool isOnline;
+  final DateTime? lastSeen;
 
   UserModel({
     required this.uid,
@@ -29,7 +31,9 @@ class UserModel {
     required this.requestsCount,
     required this.nameLower,
     required this.whoCanCallMe,
-    required this.whoCanMessageMe
+    required this.whoCanMessageMe,
+    required this.isOnline,
+    this.lastSeen
   });
   Map<String, dynamic> toMap() {
     return {
@@ -47,6 +51,8 @@ class UserModel {
       "nameLower": name.toLowerCase(),
       "whoCanCallMe": whoCanCallMe,
       "whoCanMessageMe": whoCanMessageMe,
+      "isOnline": isOnline,
+      "lastSeen": lastSeen?.toIso8601String(),
     };
   }
 
@@ -68,6 +74,8 @@ class UserModel {
       nameLower: map["nameLower"] ?? map["name"].toString().toLowerCase(),
       whoCanCallMe: map["whoCanCallMe"] ?? "Everyone",
       whoCanMessageMe: map["whoCanMessageMe"] ?? "Everyone",
+      isOnline: map["isOnline"] ?? false,
+      lastSeen: map["lastSeen"] != null ? DateTime.parse(map["lastSeen"]) : null,
     );
   }
 }

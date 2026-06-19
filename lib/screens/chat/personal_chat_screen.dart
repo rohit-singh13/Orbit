@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:orbit/providers/chat_provider.dart';
+import 'package:orbit/services/firestore_services.dart';
 import 'package:orbit/widgets/background_widget.dart';
 import 'package:orbit/widgets/date_separator.dart';
 import 'package:provider/provider.dart';
@@ -47,7 +48,28 @@ class _PersonalChatScreenState extends State<PersonalChatScreen> {
             ),
             SizedBox( width: 12,),
             
-            Expanded(child: Text(widget.receiverName, overflow: TextOverflow.ellipsis,))
+            Expanded(
+                child: StreamBuilder(
+                    stream: FirestoreServices().streamUser(widget.receiverId),
+                    builder: (context, snapshot) {
+                      final user = snapshot.data;
+                      String statusText = "offline";
+                      if(user != null) {
+                        if(user.isOnline) {
+                          statusText = "Active now";
+                        } else if (user.lastSeen != null) {
+                          statusText = "Last seen ${formatLastSeen(user.lastSeen!)}";
+                        }
+                      }
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(widget.receiverName, style: TextStyle(fontWeight: FontWeight.w600),),
+                          Text(statusText, style: TextStyle(fontSize: 10, color: Colors.grey.shade400))
+                        ],
+                      );
+                    }))
           ],
         ),
       ),
@@ -169,6 +191,22 @@ class _PersonalChatScreenState extends State<PersonalChatScreen> {
       return 'Yesterday';
     }
     return '${date.day}/${date.month}/${date.year}';
+  }
+
+  String formatLastSeen(
+      DateTime time,
+      ) {
+    final diff = DateTime.now().difference(time);
+    if(diff.inMinutes < 1) {
+      return "just now";
+    }
+    if(diff.inHours < 1) {
+      return "${diff.inMinutes}m ago";
+    }
+    if(diff.inDays < 1) {
+      return "${diff.inHours}h ago";
+    }
+    return "${diff.inDays}d ago";
   }
 
   @override

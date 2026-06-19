@@ -46,4 +46,12 @@ class UserProvider extends ChangeNotifier{
     _imagePath = null;
     notifyListeners();
   }
+
+  Future<void> updateOnlineStatus(bool isOnline) async {
+    if(_user == null) return;
+    await _firestoreServices.updateOnlineStatus(
+        uid: _user!.uid,
+        isOnline: isOnline
+    );
+  }
 }

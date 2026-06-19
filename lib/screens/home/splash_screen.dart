@@ -27,8 +27,10 @@ class _SplashScreenState extends State<SplashScreen> {
       final userData = await FirestoreServices().getUser(uid);
 
       if (userData != null) {
-        context.read<UserProvider>().setUser(userData);
-        context.read<UserProvider>().loadLocalImage(uid);
+        final userProvider = context.read<UserProvider>();
+        userProvider.setUser(userData);
+        await userProvider.updateOnlineStatus(true);
+        userProvider.loadLocalImage(uid);
       }
       if (!mounted) return;
       Navigator.pushReplacementNamed(

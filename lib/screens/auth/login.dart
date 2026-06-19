@@ -114,8 +114,9 @@ class _LoginState extends State<Login>{
                                 final uid = FirebaseAuth.instance.currentUser!.uid;
                                 final userData = await FirestoreServices().getUser(uid);
                                 if(userData != null) {
-                                  context.read<UserProvider>()
-                                      .setUser(userData);
+                                  final userProvider = context.read<UserProvider>();
+                                  userProvider.setUser(userData);
+                                  await userProvider.updateOnlineStatus(true);
                                 }
                                 if(provider.error == null ) {
                                   Navigator.pushNamedAndRemoveUntil(
@@ -169,13 +170,19 @@ class _LoginState extends State<Login>{
 
                                 await provider.signInWithGoogle();
                                 if(!mounted) return;
-
                                 if (provider.error != null) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(provider.error!),
                                       ));
                                   return;
+                                }
+                                final uid = FirebaseAuth.instance.currentUser!.uid;
+                                final userData = await FirestoreServices().getUser(uid);
+                                if(userData != null) {
+                                  final userProvider = context.read<UserProvider>();
+                                  userProvider.setUser(userData);
+                                  await userProvider.updateOnlineStatus(true);
                                 }
                                 Navigator.pushReplacementNamed(
                                     context,

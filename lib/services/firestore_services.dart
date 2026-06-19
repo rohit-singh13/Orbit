@@ -46,4 +46,34 @@ class FirestoreServices {
       "whoCanMessageMe": whoCanMessageMe
     });
   }
+
+  Future<void> updateOnlineStatus({
+    required String uid,
+    required bool isOnline,
+  }) async {
+    final Map<String, dynamic> data = {
+      "isOnline": isOnline,
+    };
+    if (!isOnline) {
+      data["lastSeen"] =
+          DateTime.now().toIso8601String();
+    }
+    await _firestore
+        .collection(FirebaseCollections.users)
+        .doc(uid)
+        .update(data);
+  }
+
+  Stream<UserModel?> streamUser (
+      String uid,
+      ) {
+    return _firestore
+        .collection(FirebaseCollections.users)
+        .doc(uid)
+        .snapshots()
+        .map((doc) {
+          if(!doc.exists) return null;
+          return UserModel.fromMap(doc.data()!);
+    });
+  }
 }

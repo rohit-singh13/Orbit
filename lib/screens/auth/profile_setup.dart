@@ -90,10 +90,13 @@ class _ProfileSetupState extends State<ProfileSetup> {
                                       friendsCount: 0,
                                       requestsCount: 0,
                                       whoCanCallMe: "Everyone",
-                                      whoCanMessageMe: "Everyone"
+                                      whoCanMessageMe: "Everyone",
+                                      isOnline: true,
+                                      lastSeen: null,
                                     );
                                     await FirestoreServices().createUser(user);
                                     context.read<UserProvider>().setUser(user);
+                                    await context.read<UserProvider>().updateOnlineStatus(true);
                                     Navigator.pushReplacementNamed(context, AppRoutes.home);
                                   } catch (e) {
                                     ScaffoldMessenger.of(context).showSnackBar(
