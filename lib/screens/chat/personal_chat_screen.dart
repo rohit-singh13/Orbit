@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:orbit/providers/chat_provider.dart';
+import 'package:orbit/services/chat_services.dart';
 import 'package:orbit/services/firestore_services.dart';
 import 'package:orbit/widgets/background_widget.dart';
 import 'package:orbit/widgets/date_separator.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:orbit/widgets/message_bubble.dart';
+import 'package:orbit/models/chat_model.dart';
 
 class PersonalChatScreen extends StatefulWidget {
   final String receiverId;
@@ -24,6 +26,7 @@ class PersonalChatScreen extends StatefulWidget {
 
 class _PersonalChatScreenState extends State<PersonalChatScreen> {
   final TextEditingController _messageController = TextEditingController();
+  bool _isTyping = false;
 
 
   @override
@@ -47,29 +50,54 @@ class _PersonalChatScreenState extends State<PersonalChatScreen> {
               child: widget.receiverImageUrl == null ? const Icon(Icons.person) : null,
             ),
             SizedBox( width: 12,),
-            
+
             Expanded(
-                child: StreamBuilder(
-                    stream: FirestoreServices().streamUser(widget.receiverId),
-                    builder: (context, snapshot) {
-                      final user = snapshot.data;
-                      String statusText = "offline";
-                      if(user != null) {
-                        if(user.isOnline) {
+              child: StreamBuilder(
+                stream: FirestoreServices().streamUser(
+                  widget.receiverId,
+                ),
+                builder: (context, userSnapshot) {
+                  final user = userSnapshot.data;
+                  return StreamBuilder<ChatModel?>(
+                    stream: ChatServices().streamChat(widget.receiverId,),
+                    builder: (context, chatSnapshot) {
+                      String statusText = "Offline";
+                      final chat = chatSnapshot.data;
+                      final otherTyping = chat?.typingUsers.contains(widget.receiverId,) ?? false;
+                      if (otherTyping) {
+                        statusText = "Typing...";
+                      } else if (user != null) {
+                        if (user.isOnline) {
                           statusText = "Active now";
                         } else if (user.lastSeen != null) {
-                          statusText = "Last seen ${formatLastSeen(user.lastSeen!)}";
+                          statusText =
+                          "Last seen ${formatLastSeen(user.lastSeen!)}";
                         }
                       }
                       return Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(widget.receiverName, style: TextStyle(fontWeight: FontWeight.w600),),
-                          Text(statusText, style: TextStyle(fontSize: 10, color: Colors.grey.shade400))
+                          Text(
+                            widget.receiverName,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Text(
+                            statusText,
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.grey.shade400,
+                            ),
+                          ),
                         ],
                       );
-                    }))
+                    },
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
@@ -146,6 +174,18 @@ class _PersonalChatScreenState extends State<PersonalChatScreen> {
                     child: TextField(
                       controller: _messageController,
                       decoration: const InputDecoration(hintText: 'Type a message...',),
+                      onChanged: (value) async {
+                        if(value.trim().isNotEmpty && !_isTyping) {
+                          _isTyping = true;
+                          await context.read<ChatProvider>()
+                              .setTypingStatus(otherUserId: widget.receiverId, isTyping: true);
+                        }
+                        if(value.trim().isEmpty && _isTyping) {
+                          _isTyping = false;
+                          await context.read<ChatProvider>()
+                              .setTypingStatus(otherUserId: widget.receiverId, isTyping: false);
+                        }
+                      },
                     ),
                   ),
 
@@ -154,6 +194,11 @@ class _PersonalChatScreenState extends State<PersonalChatScreen> {
                       final text = _messageController.text;
                       if (text.trim().isEmpty) return;
                       _messageController.clear();
+                      if(_isTyping) {
+                        _isTyping = false;
+                        await context.read<ChatProvider>()
+                            .setTypingStatus(otherUserId: widget.receiverId, isTyping: false);
+                      }
                       await context.read<ChatProvider>().sendMessage(
                         receiverId: widget.receiverId,
                         text: text,
@@ -211,6 +256,9 @@ class _PersonalChatScreenState extends State<PersonalChatScreen> {
 
   @override
   void dispose() {
+    if(_isTyping) {
+      context.read<ChatProvider>().setTypingStatus(otherUserId: widget.receiverId, isTyping: false);
+    }
     _messageController.dispose();
     super.dispose();
   }

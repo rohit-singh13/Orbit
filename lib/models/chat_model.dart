@@ -12,6 +12,8 @@ class ChatModel {
   final DateTime createdAt;
   final DateTime updatedAt;
 
+  final List<String> typingUsers;
+
   ChatModel({
     required this.id,
     required this.participants,
@@ -21,7 +23,8 @@ class ChatModel {
     required this.lastMessageTime,
     required this.unreadCounts,
     required this.createdAt,
-    required this.updatedAt
+    required this.updatedAt,
+    required this.typingUsers,
 });
 
   Map<String, dynamic> toMap() {
@@ -33,7 +36,8 @@ class ChatModel {
       'lastMessageTime': lastMessageTime != null ? Timestamp.fromDate(lastMessageTime!)  : null,
       'unreadCounts': unreadCounts,
       'createdAt': Timestamp.fromDate(createdAt),
-      'updatedAt': Timestamp.fromDate(updatedAt)
+      'updatedAt': Timestamp.fromDate(updatedAt),
+      "typingUsers": typingUsers,
     };
   }
 
@@ -50,7 +54,8 @@ class ChatModel {
         lastMessageTime: map['lastMessageTime'] != null ? (map['lastMessageTime'] as Timestamp).toDate() : null,
         unreadCounts: Map<String, int>.from(map['unreadCounts'] ?? {}),
         createdAt: (map['createdAt'] as Timestamp).toDate(),
-        updatedAt: (map['updatedAt'] as Timestamp).toDate()
+        updatedAt: (map['updatedAt'] as Timestamp).toDate(),
+        typingUsers: List<String>.from(map['typingUsers'] ?? []),
     );
   }
 }

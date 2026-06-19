@@ -68,6 +68,24 @@ class ChatProvider extends ChangeNotifier{
     await _chatServices.markMessagesAsRead(otherUserId);
   }
 
+  Future<void> setTypingStatus({
+    required String otherUserId,
+    required bool isTyping
+}) async {
+    await _chatServices.setTypingStatus(
+        otherUserId: otherUserId,
+        isTyping: isTyping
+    );
+  }
+
+  Future<void> clearTypingStatus() async {
+    for(final chat in _chats) {
+      for(final participant in chat.participants) {
+        await _chatServices.setTypingStatus(otherUserId: participant, isTyping: false);
+      }
+    }
+  }
+
   @override
   void dispose() {
     _messagesSubscription?.cancel();

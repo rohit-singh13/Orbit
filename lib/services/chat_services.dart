@@ -35,7 +35,8 @@ class ChatServices {
         lastMessageTime: null,
         unreadCounts: {currentUid: 0, otherUserId: 0},
         createdAt: now,
-        updatedAt: now
+        updatedAt: now,
+        typingUsers: [],
     );
     await chatRef.set(chat.toMap());
   }
@@ -144,6 +145,44 @@ class ChatServices {
     },
     ).toList()
     );
+  }
+
+  Future<void> setTypingStatus({
+    required String otherUserId,
+    required bool isTyping,
+  }) async {
+    final currentUid = _auth.currentUser!.uid;
+    final chatId = getChatId(
+      currentUid,
+      otherUserId,
+    );
+    final chatRef = _firestore
+        .collection(FirebaseCollections.chats)
+        .doc(chatId);
+    if (isTyping) {
+      await chatRef.update({
+        'typingUsers': FieldValue.arrayUnion(
+          [currentUid],
+        ),
+      });
+    } else {
+      await chatRef.update({
+        'typingUsers': FieldValue.arrayRemove(
+          [currentUid],
+        ),
+      });
+    }
+  }
+
+  Stream<ChatModel?> streamChat(
+      String otherUserId
+      ) {
+    final currentUid = _auth.currentUser!.uid;
+    final chatId = getChatId(currentUid, otherUserId);
+    return _firestore.collection(FirebaseCollections.chats).doc(chatId).snapshots().map((doc) {
+      if(!doc.exists) return null;
+      return ChatModel.fromMap(doc.id, doc.data()!);
+    });
   }
 
 }

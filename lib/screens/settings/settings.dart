@@ -150,6 +150,7 @@ class _SettingsState extends State<Settings> {
                           await context.read<UserProvider>().updateOnlineStatus(false);
                           context.read<UserProvider>().clearUser();
                           context.read<SearchProvider>().clearSearch();
+                          await context.read<ChatProvider>().clearTypingStatus();
                           context.read<ChatProvider>().clearChat();
                           await context.read<AuthProvider>().signOut();
                           if (!context.mounted) return;
