@@ -17,8 +17,8 @@ import 'package:orbit/screens/search/explore.dart';
 import 'package:orbit/screens/search/search_screen.dart';
 import 'package:orbit/screens/settings/privacy.dart';
 import 'package:orbit/screens/settings/settings.dart';
+import 'package:orbit/screens/social/create_post_screen.dart';
 import 'package:orbit/screens/social/signal.dart';
-import 'package:path/path.dart';
 
 class AppRoutes {
   static const intro = "/intro";
@@ -41,6 +41,7 @@ class AppRoutes {
   static const search = "/search";
   static const userProfile = "/user-Profile";
   static const personalChat = "/personal-chat";
+  static const createPost = "/create-post";
 
   static Map<String, WidgetBuilder>
   routes = {
@@ -67,6 +68,7 @@ class AppRoutes {
       final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
       return PersonalChatScreen(receiverId: args['receiverId'], receiverName: args['receiverName'], receiverImageUrl: args['receiverImageUrl'],);
     },
+    createPost: (context) => const CreatePostScreen(),
 
   };
 }

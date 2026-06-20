@@ -1,5 +1,6 @@
 import 'package:orbit/providers/chat_provider.dart';
 import 'package:orbit/providers/friend_provider.dart';
+import 'package:orbit/providers/post_provider.dart';
 import 'package:orbit/providers/search_provider.dart';
 import 'package:orbit/providers/user_provider.dart';
 import 'package:provider/provider.dart';
@@ -20,6 +21,9 @@ class DependencyInjection {
     ),
     ChangeNotifierProvider(
         create: (_) => ChatProvider()
+    ),
+    ChangeNotifierProvider(
+        create: (_) => PostProvider()
     ),
   ];
 }

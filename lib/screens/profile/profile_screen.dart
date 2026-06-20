@@ -1,9 +1,12 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:orbit/models/post_model.dart';
 import 'package:orbit/routes/app_routes.dart';
+import 'package:orbit/services/post_services.dart';
 import 'package:orbit/widgets/background_widget.dart';
 import 'package:orbit/screens/home/bottom_navigation.dart';
 import 'package:orbit/providers/user_provider.dart';
+import 'package:orbit/widgets/post_grid.dart';
 import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
 
@@ -21,6 +24,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = context.watch<UserProvider>().user;
     final imagePath = context.watch<UserProvider>().imagePath;
     return Scaffold(
+      floatingActionButton:
+      FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(
+            context,
+            AppRoutes.createPost,
+          );
+        },
+        child: const Icon(Icons.add),
+      ),
       body: AppBackground(
           child: SafeArea(
             child: Column(
@@ -76,7 +89,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          _statItem("0", "Posts"),
+                          StreamBuilder(
+                              stream: PostServices().streamUserPosts(user!.uid),
+                              builder: (context, snapshot) {
+                                final count = snapshot.data?.length ?? 0;
+                                return _statItem(count.toString(), "Posts");
+                              }),
                           GestureDetector(
                             onTap: () {
                               Navigator.pushNamed(context, AppRoutes.friendsList);
@@ -90,17 +108,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     SizedBox(
                       height: 20,
                     ),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.photo_library_outlined,
-                          size: 80,
-                        ),
-                        SizedBox(height: 15),
-                        Text("No Posts Yet"),
-                      ],
-                    ),
+                    StreamBuilder<List<PostModel>>(
+                        stream: PostServices().streamUserPosts(user!.uid),
+                        builder: (context, snapshot) {
+                          if(!snapshot.hasData) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          return PostGrid(posts: snapshot.data!);
+                        })
                   ],
                 ),
             ),

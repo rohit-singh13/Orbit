@@ -2,8 +2,8 @@ import 'package:cloudinary_public/cloudinary_public.dart';
 
 class CloudinaryService {
   final cloudinary = CloudinaryPublic(
-      'dpwbu9j1z',
-      'peky9ddr',
+      'djqprra64',
+      'orbit_posts',
     cache: false
   );
 
@@ -20,5 +20,18 @@ class CloudinaryService {
       print("Cloudinary Upload Error: $e");
       return null;
     }
+  }
+
+  Future<List<String>> uploadImages(
+      List<String> imagePaths
+      ) async {
+    List<String> urls = [];
+    for(String imagePath in imagePaths) {
+      final String? url = await uploadImage(imagePath);
+      if(url != null) {
+        urls.add(url);
+      }
+    }
+    return urls;
   }
 }

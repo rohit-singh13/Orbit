@@ -16,4 +16,9 @@ class MediaPicker {
       userProvider.setImagePath(image.path);
     }
   }
+
+  Future<List<String>> pickMultipleImages() async {
+    final List<XFile> images = await picker.pickMultiImage();
+    return images.map((image) => image.path).toList();
+  }
 }

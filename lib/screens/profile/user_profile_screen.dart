@@ -1,11 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:orbit/models/post_model.dart';
 import 'package:orbit/models/user_model.dart';
 import 'package:orbit/routes/app_routes.dart';
 import 'package:orbit/screens/home/bottom_navigation.dart';
 import 'package:orbit/services/firestore_services.dart';
 import 'package:orbit/services/friend_services.dart';
+import 'package:orbit/services/post_services.dart';
 import 'package:orbit/widgets/background_widget.dart';
+import 'package:orbit/widgets/post_grid.dart';
 
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
@@ -97,11 +100,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                _statItem(
-                                  "0",
-                                  "Posts",
+                                StreamBuilder<List<PostModel>>(
+                                  stream: PostServices().streamUserPosts(user.uid,),
+                                  builder: (context, snapshot) {
+                                    final count = snapshot.data?.length ?? 0;
+                                    return _statItem(
+                                      count.toString(),
+                                      "Posts",
+                                    );
+                                  },
                                 ),
-
                                 _statItem(
                                   user.friendsCount.toString(),
                                   "Friends",
@@ -290,7 +298,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                             else
                                               Column(
                                                 children: [
-                                                  Text("No posts yet")
+                                                  StreamBuilder<List<PostModel>>(
+                                                      stream: PostServices().streamUserPosts(user.uid),
+                                                      builder: (context, snapshot) {
+                                                        if(!snapshot.hasData) {
+                                                          return const Center(
+                                                            child: CircularProgressIndicator(),
+                                                          );
+                                                        }
+                                                        return PostGrid(posts: snapshot.data!);
+                                                      })
                                                 ],
                                               )
                                           ],
