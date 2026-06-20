@@ -17,6 +17,8 @@ class PostProvider extends ChangeNotifier{
   Future<bool> createPost({
     required String caption,
     required List<String> imagePaths,
+    required String userName,
+    String? userImageUrl
   }) async {
     try {
       _isLoading = true;
@@ -38,6 +40,8 @@ class PostProvider extends ChangeNotifier{
           likesCount: 0,
           commentsCount: 0,
           createdAt: DateTime.now(),
+          userName: userName,
+          userImageUrl: userImageUrl
       );
       await _postService.createPost(post);
       return true;

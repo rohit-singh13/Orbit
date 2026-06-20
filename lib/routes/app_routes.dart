@@ -18,6 +18,7 @@ import 'package:orbit/screens/search/search_screen.dart';
 import 'package:orbit/screens/settings/privacy.dart';
 import 'package:orbit/screens/settings/settings.dart';
 import 'package:orbit/screens/social/create_post_screen.dart';
+import 'package:orbit/screens/social/post_detail_screen.dart';
 import 'package:orbit/screens/social/signal.dart';
 
 class AppRoutes {
@@ -42,6 +43,7 @@ class AppRoutes {
   static const userProfile = "/user-Profile";
   static const personalChat = "/personal-chat";
   static const createPost = "/create-post";
+  static const postDetails = "/post-details";
 
   static Map<String, WidgetBuilder>
   routes = {
@@ -69,6 +71,7 @@ class AppRoutes {
       return PersonalChatScreen(receiverId: args['receiverId'], receiverName: args['receiverName'], receiverImageUrl: args['receiverImageUrl'],);
     },
     createPost: (context) => const CreatePostScreen(),
+    postDetails: (context) => const PostDetailScreen(),
 
   };
 }

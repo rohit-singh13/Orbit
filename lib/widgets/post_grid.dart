@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:orbit/models/post_model.dart';
+import 'package:orbit/routes/app_routes.dart';
 
 class PostGrid extends StatelessWidget {
   final List<PostModel> posts;
@@ -32,7 +33,7 @@ class PostGrid extends StatelessWidget {
         final post = posts[index];
         return GestureDetector(
           onTap: () {
-            //it will open the full post screen
+            Navigator.pushNamed(context, AppRoutes.postDetails, arguments: post.id);
           },
           child: Image.network(
               post.imageUrls.first,

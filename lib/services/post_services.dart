@@ -67,5 +67,29 @@ class PostServices {
         .map((snapshot) => snapshot.docs.length);
   }
 
+  Stream<PostModel?> streamPost(
+      String postId
+      ) {
+    return _firestore
+        .collection(FirebaseCollections.posts)
+        .doc(postId)
+        .snapshots()
+        .map((doc) {
+      if(!doc.exists) return null;
+      return PostModel.fromMap(doc.data()!);
+    });
+  }
+
+  Future<PostModel?> getPost(String postId) async {
+    final doc = await _firestore
+        .collection(FirebaseCollections.posts)
+        .doc(postId)
+        .get();
+
+    if (!doc.exists) return null;
+
+    return PostModel.fromMap(doc.data()!);
+  }
+
 
 }

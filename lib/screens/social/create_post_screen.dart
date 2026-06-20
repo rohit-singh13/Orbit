@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:orbit/providers/post_provider.dart';
+import 'package:orbit/providers/user_provider.dart';
 import 'package:orbit/services/media_picker.dart';
 import 'package:orbit/widgets/custom_button.dart';
 import 'package:orbit/widgets/custom_textfield.dart';
@@ -35,9 +36,12 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       return;
     }
     final provider = context.read<PostProvider>();
+    final currentUser = context.read<UserProvider>().user!;
     final success = await provider.createPost(
         caption: _captionController.text.trim(),
-        imagePaths: _selectedImages
+        imagePaths: _selectedImages,
+        userName: currentUser.name,
+        userImageUrl: currentUser.imageUrl
     );
     if(!mounted) return;
 
@@ -104,5 +108,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         ),
       ),
     );
+  }
+  @override
+  void dispose() {
+    _captionController.dispose();
+    super.dispose();
   }
 }

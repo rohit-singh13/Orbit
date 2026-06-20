@@ -108,16 +108,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     SizedBox(
                       height: 20,
                     ),
-                    StreamBuilder<List<PostModel>>(
-                        stream: PostServices().streamUserPosts(user!.uid),
-                        builder: (context, snapshot) {
-                          if(!snapshot.hasData) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-                          return PostGrid(posts: snapshot.data!);
-                        })
+                    StreamBuilder<List<PostModel>>(stream: PostServices().streamUserPosts(user!.uid),
+                      builder: (context, snapshot) {
+                        if(snapshot.hasError) {
+                          return Text(snapshot.error.toString());
+                        }
+                        if(snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        return PostGrid(posts: snapshot.data ?? [],);
+                      },
+                    )
                   ],
                 ),
             ),
