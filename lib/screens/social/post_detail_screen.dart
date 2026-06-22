@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:orbit/models/post_model.dart';
 import 'package:orbit/providers/post_provider.dart';
 import 'package:orbit/services/post_services.dart';
+import 'package:orbit/widgets/comments_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 
 class PostDetailScreen extends StatefulWidget {
@@ -17,33 +18,6 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   late Stream<PostModel?> _postStream;
   final PageController _pageController = PageController();
   bool _initialized = false;
-
-  Future<void> _confirmDelete(String postId) async {
-    final confirmed = await showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text("Delete Post"),
-            content: const Text("Deleted Posts can not be retrieved in future"),
-            actions: [
-              TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: Text("Cancel")),
-              ElevatedButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  child: Text("Confirm"),
-              )
-            ],
-          );
-        });
-    if(confirmed == true) {
-      await context.read<PostProvider>().deletePost(postId);
-      if(!mounted) return;
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Post Deleted")));
-    }
-  }
-
 
   @override
   void didChangeDependencies() {
@@ -171,7 +145,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                       const SizedBox(width: 20),
                       IconButton(
                         onPressed: () {
-                          // comments later
+                          _showComments(post);
                         },
                         icon: const Icon(Icons.chat_bubble_outline),
                       ),
@@ -195,5 +169,42 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   void dispose() {
     _pageController.dispose();
     super.dispose();
+  }
+
+  Future<void> _confirmDelete(String postId) async {
+    final confirmed = await showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Delete Post"),
+            content: const Text("Deleted Posts can not be retrieved in future"),
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text("Cancel")),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text("Confirm"),
+              )
+            ],
+          );
+        });
+    if(confirmed == true) {
+      await context.read<PostProvider>().deletePost(postId);
+      if(!mounted) return;
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Post Deleted")));
+    }
+  }
+  
+  void _showComments(PostModel post) {
+    showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        showDragHandle: true,
+        builder: (context) {
+          return CommentsBottomSheet(postId: post.id,);
+      }
+    );
   }
 }
