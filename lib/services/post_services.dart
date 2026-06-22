@@ -91,5 +91,48 @@ class PostServices {
     return PostModel.fromMap(doc.data()!);
   }
 
+  Future<void> toggleLike(
+      String postId,
+      String userId
+      ) async {
+    final likeRef = _firestore
+        .collection(FirebaseCollections.posts)
+        .doc(postId)
+        .collection("likes")
+        .doc(userId);
+    final postRef = _firestore
+        .collection(FirebaseCollections.posts)
+        .doc(postId);
+    final likeDoc = await likeRef.get();
+    if(likeDoc.exists) {
+      await likeRef.delete();
+      await postRef.update({
+        "likesCount": FieldValue.increment(-1)
+      });
+    } else {
+      await likeRef.set({
+        "userId": userId,
+        "createdAt": DateTime.now().toIso8601String()
+      });
+
+      await postRef.update({
+        "likesCount": FieldValue.increment(1)
+      });
+    }
+  }
+
+  Stream<bool> isPostLiked(
+      String postId,
+      String userId
+      ) {
+    return _firestore
+        .collection(FirebaseCollections.posts)
+        .doc(postId)
+        .collection("likes")
+        .doc(userId)
+        .snapshots()
+        .map((doc) => doc.exists);
+  }
+
 
 }

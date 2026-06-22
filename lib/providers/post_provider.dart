@@ -68,4 +68,11 @@ class PostProvider extends ChangeNotifier{
       notifyListeners();
     }
   }
+
+  Future<void> toggleLike(
+      String postId
+      ) async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    await _postService.toggleLike(postId, uid);
+  }
 }

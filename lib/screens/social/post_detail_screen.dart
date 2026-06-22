@@ -1,6 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:orbit/models/post_model.dart';
+import 'package:orbit/providers/post_provider.dart';
 import 'package:orbit/services/post_services.dart';
+import 'package:provider/provider.dart';
 
 class PostDetailScreen extends StatefulWidget {
   const PostDetailScreen({super.key});
@@ -11,9 +14,35 @@ class PostDetailScreen extends StatefulWidget {
 
 class _PostDetailScreenState extends State<PostDetailScreen> {
   int _currentImageIndex = 0;
-  late Future<PostModel?> _postFuture;
+  late Stream<PostModel?> _postStream;
   final PageController _pageController = PageController();
   bool _initialized = false;
+
+  Future<void> _confirmDelete(String postId) async {
+    final confirmed = await showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Delete Post"),
+            content: const Text("Deleted Posts can not be retrieved in future"),
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text("Cancel")),
+              ElevatedButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: Text("Confirm"),
+              )
+            ],
+          );
+        });
+    if(confirmed == true) {
+      await context.read<PostProvider>().deletePost(postId);
+      if(!mounted) return;
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Post Deleted")));
+    }
+  }
 
 
   @override
@@ -21,7 +50,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     super.didChangeDependencies();
     if (!_initialized) {
       final postId = ModalRoute.of(context)!.settings.arguments as String;
-      _postFuture = PostServices().getPost(postId);
+      _postStream = PostServices().streamPost(postId);
       _initialized = true;
     }
   }
@@ -32,21 +61,22 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       appBar: AppBar(
         title: const Text("Post"),
       ),
-      body: FutureBuilder<PostModel?>(
-          future: _postFuture,
+      body: StreamBuilder<PostModel?>(
+          stream: _postStream,
           builder: ((context, snapshot) {
-            if(snapshot.connectionState == ConnectionState.waiting) {
+            if(!snapshot.hasData) {
               return const Center(
                 child: CircularProgressIndicator(),
               );
             }
-            if(!snapshot.hasData || snapshot.data == null) {
+            if(snapshot.data == null) {
               return const Center(
                 child: Text("Post not found"),
               );
             }
             final post = snapshot.data!;
-            print("POST DETAIL REBUILT");
+            final currentUserId = FirebaseAuth.instance.currentUser!.uid;
+            final isOwner = currentUserId == post.userId;
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -56,6 +86,11 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     child: post.userImageUrl == null ? const Icon(Icons.person) : null,
                   ),
                   title: Text(post.userName),
+                  trailing: isOwner ? IconButton(
+                      alignment: Alignment.centerRight,
+                      onPressed: () => _confirmDelete(post.id),
+                      icon: Icon(Icons.more_vert))
+                      : null,
                 ),
                 SizedBox(
                   height: 400,
@@ -104,12 +139,50 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     ),
                   ),
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Text(post.caption),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Text(post.createdAt.toString()),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Row(
+                    children: [
+                      StreamBuilder<bool>(
+                        stream: PostServices().isPostLiked(
+                          post.id,
+                          FirebaseAuth.instance.currentUser!.uid,
+                        ),
+                        builder: (context, snapshot) {
+                          final isLiked = snapshot.data ?? false;
+                          return IconButton(
+                            onPressed: () {
+                              context.read<PostProvider>().toggleLike(post.id);
+                            },
+                            icon: Icon(
+                              isLiked ? Icons.favorite : Icons.favorite_border,
+                              color: isLiked ? Colors.red : null,
+                            ),
+                          );
+                        },
+                      ),
+                      Text("${post.likesCount}", style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      IconButton(
+                        onPressed: () {
+                          // comments later
+                        },
+                        icon: const Icon(Icons.chat_bubble_outline),
+                      ),
+                      Text(
+                        "${post.commentsCount}",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 20,),
               ],
