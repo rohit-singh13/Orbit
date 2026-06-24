@@ -20,6 +20,7 @@ class MyApp extends StatelessWidget{
         darkTheme: AppTheme.darkTheme,
         themeMode: ThemeMode.system,
         routes: AppRoutes.routes,
+        onGenerateRoute: AppRoutes.generateRoute,
         home: const SplashScreen(),
       ),
     );

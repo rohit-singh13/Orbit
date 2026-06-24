@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:orbit/models/story_model.dart';
+import 'package:orbit/providers/friend_provider.dart';
+import 'package:orbit/providers/user_provider.dart';
 import 'package:orbit/routes/app_routes.dart';
-import 'package:orbit/services/chat_services.dart';
+import 'package:orbit/services/story_services.dart';
 import 'package:orbit/widgets/background_widget.dart';
 import 'package:orbit/screens/home/bottom_navigation.dart';
+import 'package:orbit/widgets/friend_story_grid.dart';
+import 'package:orbit/widgets/my_story_widget.dart';
+import 'package:provider/provider.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -13,14 +19,35 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
+    final currentUser = context.watch<UserProvider>().user!;
+    final friends = context.watch<FriendProvider>().friends;
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Orbit"),
+      ),
       body: AppBackground(
           child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Welcome to the Orbit", style: TextStyle(fontSize: 20),),
-                ],
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 40,),
+
+                    StreamBuilder<List<StoryModel>>(
+                        stream: StoryServices().streamUserStories(
+                        currentUser.uid
+                        ),
+                        builder: (context, snapshot) {
+                          return MyStoryWidget(
+                              imageUrl: currentUser.imageUrl,
+                              stories: snapshot.data ?? []
+                          );
+                        }),
+
+                    const SizedBox(height: 30,),
+
+                    FriendStoryGrid(friends: friends)
+                  ],
+                ),
               ))),
       bottomNavigationBar: BottomNavigation(
           currentIndex: 0,

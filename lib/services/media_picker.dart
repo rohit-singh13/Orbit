@@ -21,4 +21,9 @@ class MediaPicker {
     final List<XFile> images = await picker.pickMultiImage();
     return images.map((image) => image.path).toList();
   }
+
+  Future<String?> pickStoryImage() async {
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    return image?.path;
+  }
 }

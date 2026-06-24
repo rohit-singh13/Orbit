@@ -3,6 +3,7 @@ import 'package:orbit/providers/comment_provider.dart';
 import 'package:orbit/providers/friend_provider.dart';
 import 'package:orbit/providers/post_provider.dart';
 import 'package:orbit/providers/search_provider.dart';
+import 'package:orbit/providers/story_provider.dart';
 import 'package:orbit/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
@@ -28,6 +29,9 @@ class DependencyInjection {
     ),
     ChangeNotifierProvider(
         create: (_) => CommentProvider()
+    ),
+    ChangeNotifierProvider(
+        create: (_) => StoryProvider()
     ),
   ];
 }

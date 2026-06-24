@@ -20,6 +20,9 @@ import 'package:orbit/screens/settings/settings.dart';
 import 'package:orbit/screens/social/create_post_screen.dart';
 import 'package:orbit/screens/social/post_detail_screen.dart';
 import 'package:orbit/screens/social/signal.dart';
+import 'package:orbit/screens/stories/create_story_screen.dart';
+import 'package:orbit/screens/stories/story_viewer_screen.dart';
+import 'package:orbit/widgets/story_viewer_arguments.dart';
 
 class AppRoutes {
   static const intro = "/intro";
@@ -32,7 +35,7 @@ class AppRoutes {
   static const profile = "/profile-screen";
   static const chatList = "/Chat-List-screen";
   static const signal = "/signal-video-screen";  // as reels
-  static const moments = "/moments-screen"; // as story
+  static const stories = "/stories-screen";
   static const explore = "/explore-screen"; // as exploration
   static const editProfile = "/edit-profile-screen";
   static const settings = "/settings";
@@ -44,6 +47,8 @@ class AppRoutes {
   static const personalChat = "/personal-chat";
   static const createPost = "/create-post";
   static const postDetails = "/post-details";
+  static const createStory = "/create-story";
+  static const viewStory = "/story-viewer";
 
   static Map<String, WidgetBuilder>
   routes = {
@@ -57,7 +62,6 @@ class AppRoutes {
     profile: (context) => const ProfileScreen(),
     chatList: (context) => const ChatList(),
     signal: (context) => const Signal(),
-    // moments: (context) => const Moments(),
     explore: (context) => const Explore(),
     editProfile: (context) => const EditProfile(),
     settings: (context) => const Settings(),
@@ -72,6 +76,22 @@ class AppRoutes {
     },
     createPost: (context) => const CreatePostScreen(),
     postDetails: (context) => const PostDetailScreen(),
-
+    createStory: (context) => const CreateStoryScreen(),
   };
+
+  static Route<dynamic>? generateRoute(
+      RouteSettings settings
+      ) {
+    switch(settings.name) {
+      case viewStory:
+        final args = settings.arguments as StoryViewerArguments;
+
+        return MaterialPageRoute(
+            builder: (_) => StoryViewerScreen(
+                stories: args.stories,
+              initialIndex: args.initialIndex,
+            ));
+    }
+    return null;
+  }
 }

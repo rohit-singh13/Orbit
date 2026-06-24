@@ -13,5 +13,6 @@ class FirebaseCollections {
   static const comments = "comments";
   static const savedPosts = "saved_posts";
 
+  static const stories = "stories";
   // same for post, stories, chats, notifications
 }
