@@ -4,7 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:orbit/models/story_model.dart';
+import 'package:orbit/providers/story_provider.dart';
+import 'package:orbit/services/chat_services.dart';
 import 'package:orbit/services/story_services.dart';
+import 'package:orbit/widgets/story_header.dart';
+import 'package:orbit/widgets/story_progress_bar.dart';
+import 'package:orbit/widgets/story_reply_bar.dart';
+import 'package:orbit/widgets/story_view_count.dart';
+import 'package:provider/provider.dart';
 
 class StoryViewerScreen extends StatefulWidget {
   final List<StoryModel> stories;
@@ -26,6 +33,10 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> with SingleTicker
   late AnimationController _progressController;
   bool get _isOwner => widget.stories[_currentIndex].userId == FirebaseAuth.instance.currentUser!.uid;
 
+  final TextEditingController _replyController = TextEditingController();
+  late FocusNode _replyFocusNode;
+  bool _isSendingReply = false;
+
   @override
   void initState() {
     super.initState();
@@ -39,11 +50,24 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> with SingleTicker
         vsync: this,
       duration: const Duration(seconds: 5)
     );
+    _replyFocusNode = FocusNode();
+    _replyFocusNode.addListener(() {
+      if(_replyFocusNode.hasFocus) {
+        _progressController.stop();
+      } else {
+        if(!_progressController.isAnimating && _progressController.value < 1.0) {
+          _progressController.forward();
+        }
+      }
+    });
     _progressController.forward();
     _progressController.addStatusListener((status) {
       if(status == AnimationStatus.completed) {
         _nextStory();
       }
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _preloadNextStory();
     });
   }
 
@@ -84,6 +108,15 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> with SingleTicker
                   child: SizedBox.expand(
                     child: Image.network(
                       story.imageUrl,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Center(
+                          child: Icon(
+                            Icons.broken_image,
+                            color: Colors.white,
+                            size: 50,
+                          ),
+                        );
+                      },
                       fit: BoxFit.cover,
                       loadingBuilder: (context, child, progress) {
                         if(progress == null) {
@@ -114,104 +147,25 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> with SingleTicker
                 child: AnimatedBuilder(
                    animation: _progressController,
                   builder: (context, child) {
-                     return Row(
-                       children: List.generate(
-                           widget.stories.length,
-                               (index) {
-                             return Expanded(
-                                 child: Container(
-                                   margin: const EdgeInsets.symmetric(horizontal: 2),
-                                   height: 3,
-                                   decoration: BoxDecoration(
-                                     color: Colors.white24,
-                                     borderRadius: BorderRadius.circular(10),
-                                   ),
-                                   child: LayoutBuilder(
-                                       builder: (context, constraints) {
-                                         double progress;
-                                         if(index < _currentIndex) {
-                                           progress = 1;
-                                         } else if (index > _currentIndex) {
-                                           progress = 0;
-                                         } else {
-                                           progress = _progressController.value;
-                                         }
-                                         return Align(
-                                           alignment: Alignment.centerLeft,
-                                           child: Container(
-                                             width: constraints.maxWidth * progress,
-                                             decoration: BoxDecoration(
-                                                 color: Colors.white,
-                                                 borderRadius: BorderRadius.circular(10)
-                                             ),
-                                           ),
-                                         );
-                                       }
-                                   ),
-                                 )
-                             );
-                           }
-                       ),
+                     return StoryProgressBar(
+                         currentIndex: _currentIndex,
+                         totalStories: widget.stories.length,
+                         progress: _progressController.value
                      );
                   },
                 ),
               ),
-              SizedBox(height: 10,),
               Positioned(
                 top: MediaQuery.of(context).padding.top,
-                left: 0,
-                right: 0,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(
-                          Icons.arrow_back,
-                          color: Colors.white,
-                        ),
-                      ),
-
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundImage: story.userImageUrl != null
-                            ? NetworkImage(story.userImageUrl!)
-                            : null,
-                      ),
-
-                      const SizedBox(width: 10),
-
-                      Expanded(
-                        child: Text(
-                          story.userName,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-
-                      Text(
-                        formatTimeAgo(story.createdAt),
-                        style: const TextStyle(
-                          color: Colors.white70,
-                        ),
-                      ),
-
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(
-                          Icons.close,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                  left: 0,
+                  right: 0,
+                  child: StoryHeader(
+                      story: story,
+                      isOwner: _isOwner,
+                      timeAgo: formatTimeAgo(story.createdAt),
+                      onBack: () => Navigator.pop(context),
+                      onDelete: _deleteCurrentStory
+                  )
               ),
               if(_isOwner)
               Positioned(
@@ -219,30 +173,16 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> with SingleTicker
                 left: 0,
                 right: 0,
                 child: Center(
-                  child: GestureDetector(
-                    onTap: _showViewers,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.black54,
-                        borderRadius: BorderRadius.circular(20)
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.remove_red_eye,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          SizedBox(width: 6,),
-                          Text("${story.viewers.length}", style: TextStyle(color: Colors.white),)
-                        ],
-                      ),
-                    ),
-                  ),
+                  child: StoryViewCount(count: story.viewers.length, onTap: _showViewers)
                 ),
-              )
+              ),
+              if(!_isOwner)
+                Positioned(
+                  bottom: MediaQuery.of(context).padding.bottom + 16,
+                    left: 12,
+                    right: 12,
+                    child: StoryReplyBar(controller: _replyController, focusNode: _replyFocusNode, onSend: _sendStoryReply, isSending: _isSendingReply,)
+                )
             ],
           ),
         ),
@@ -252,6 +192,8 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> with SingleTicker
 
   @override
   void dispose() {
+    _replyFocusNode.dispose();
+    _replyController.dispose();
     _progressController.dispose();
     SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.edgeToEdge,
@@ -269,10 +211,13 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> with SingleTicker
   }
 
   Future<void> _nextStory() async {
+    _replyController.clear();
+    _replyFocusNode.unfocus();
     if(_currentIndex < widget.stories.length - 1) {
       setState(() {
         _currentIndex++;
       });
+      _preloadNextStory();
       _progressController
       ..reset()
       ..forward();
@@ -285,10 +230,13 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> with SingleTicker
   }
 
   Future<void> _previousStory() async {
+    _replyController.clear();
+    _replyFocusNode.unfocus();
     if(_currentIndex > 0){
       setState(() {
         _currentIndex--;
       });
+      _preloadNextStory();
       _progressController
       ..reset()
       ..forward();
@@ -328,6 +276,14 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> with SingleTicker
               );
             }
             final viewers = snapshot.data!;
+            if (viewers.isEmpty) {
+              return const SizedBox(
+                height: 200,
+                child: Center(
+                  child: Text("No views yet"),
+                ),
+              );
+            }
             return ConstrainedBox(
               constraints: BoxConstraints(
                 maxHeight: MediaQuery.of(context).size.height * 0.5,
@@ -365,5 +321,96 @@ class _StoryViewerScreenState extends State<StoryViewerScreen> with SingleTicker
     ).whenComplete(() {
       _progressController.forward();
     });
+  }
+
+  Future<void> _deleteCurrentStory() async {
+    final story = widget.stories[_currentIndex];
+    _progressController.stop();
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Delete Story"),
+          content: const Text(
+            "Are you sure you want to delete this story?",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+              child: const Text(
+                "Delete",
+                style: TextStyle(
+                  color: Colors.red,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    ).whenComplete(() {
+      if(mounted) {
+        _progressController.forward();
+      }
+    });
+
+    if (confirmed != true) return;
+
+    if (!mounted) return;
+
+    await context.read<StoryProvider>().deleteStory(
+      story.storyId,
+    );
+
+    if (mounted) {
+      Navigator.pop(context);
+    }
+  }
+
+  Future<void> _sendStoryReply() async {
+    if (_isSendingReply) return;
+    final text = _replyController.text.trim();
+    if (text.isEmpty) return;
+    setState(() {
+      _isSendingReply = true;
+    });
+    try {
+      final story = widget.stories[_currentIndex];
+      await ChatServices().sendMessage(
+        receiverId: story.userId,
+        text: text,
+      );
+      if (!mounted) return;
+      _replyController.clear();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Reply sent"),
+          duration: Duration(seconds: 1),
+        ),
+      );
+    } finally {
+      setState(() {
+        _isSendingReply = false;
+      });
+    }
+  }
+
+  void _preloadNextStory() {
+    if (_currentIndex >= widget.stories.length - 1) return;
+
+    final nextStory = widget.stories[_currentIndex + 1];
+
+    precacheImage(
+      NetworkImage(nextStory.imageUrl),
+      context,
+    );
   }
 }

@@ -63,9 +63,13 @@ class StoryProvider extends ChangeNotifier{
       ) async {
     try {
       _isLoading = true;
+      _error = null;
       notifyListeners();
 
       await _storyServices.deleteStory(storyId);
+    } catch (e) {
+      _error = e.toString();
+      rethrow;
     } finally {
       _isLoading = false;
       notifyListeners();
