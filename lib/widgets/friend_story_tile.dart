@@ -24,7 +24,7 @@ class FriendStoryTile extends StatelessWidget {
         children: [
           StoryAvatar(
             imageUrl: storyGroup.userImageUrl,
-            radius: 45,
+            radius: 42,
             hasStory: true,
             hasViewedAll: hasViewedAll,
             onTap: () {

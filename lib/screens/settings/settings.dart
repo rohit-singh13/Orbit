@@ -143,23 +143,47 @@ class _SettingsState extends State<Settings> {
                     SectionTitle(title: "Account actions"),
 
                     SettingsTile(
-                        icon: Icons.logout,
-                        title: "Logout",
-                        iconColor: Colors.orange.shade600,
-                        onTap: () async {
-                          await context.read<UserProvider>().updateOnlineStatus(false);
-                          context.read<UserProvider>().clearUser();
-                          context.read<SearchProvider>().clearSearch();
-                          await context.read<ChatProvider>().clearTypingStatus();
-                          context.read<ChatProvider>().clearChat();
-                          await context.read<AuthProvider>().signOut();
-                          if (!context.mounted) return;
-                          Navigator.pushNamedAndRemoveUntil(
-                            context,
-                            AppRoutes.intro,
-                              (route) => false
-                          );
-                        } ),
+                      icon: Icons.logout,
+                      title: "Logout",
+                      iconColor: Colors.orange.shade600,
+                      onTap: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text("Logout"),
+                            content: const Text("Are you sure you want to logout?"),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text("Cancel"),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: Text(
+                                  "Logout",
+                                  style: TextStyle(color: Colors.orange.shade600),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (confirm != true) return;
+
+                        await context.read<UserProvider>().updateOnlineStatus(false);
+                        context.read<UserProvider>().clearUser();
+                        context.read<SearchProvider>().clearSearch();
+                        await context.read<ChatProvider>().clearTypingStatus();
+                        context.read<ChatProvider>().clearChat();
+                        await context.read<AuthProvider>().signOut();
+                        if (!context.mounted) return;
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          AppRoutes.intro,
+                              (route) => false,
+                        );
+                      },
+                    ),
 
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 56),

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:orbit/providers/friend_provider.dart';
 import 'package:orbit/providers/user_provider.dart';
 import 'package:orbit/routes/app_routes.dart';
 import 'package:orbit/services/firestore_services.dart';
@@ -117,6 +118,8 @@ class _LoginState extends State<Login>{
                                   final userProvider = context.read<UserProvider>();
                                   userProvider.setUser(userData);
                                   await userProvider.updateOnlineStatus(true);
+                                  final friendProvider = context.read<FriendProvider>();
+                                  await friendProvider.loadFriends(uid);
                                 }
                                 if(provider.error == null ) {
                                   Navigator.pushNamedAndRemoveUntil(
@@ -179,6 +182,8 @@ class _LoginState extends State<Login>{
                                 }
                                 final uid = FirebaseAuth.instance.currentUser!.uid;
                                 final userData = await FirestoreServices().getUser(uid);
+                                final friendProvider = context.read<FriendProvider>();
+                                await friendProvider.loadFriends(uid);
                                 if(userData != null) {
                                   final userProvider = context.read<UserProvider>();
                                   userProvider.setUser(userData);

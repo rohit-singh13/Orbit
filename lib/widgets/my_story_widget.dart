@@ -16,14 +16,15 @@ class MyStoryWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool hasStory = stories.isNotEmpty;
+    final screenWidth = MediaQuery.of(context).size.width;
     return Column(
       children: [
         StoryAvatar(
           imageUrl: imageUrl,
-          radius: 75,
+          radius: screenWidth * 0.22,
           hasStory: hasStory,
           hasViewedAll: false,
-          showAddButton: !hasStory,
+          showAddButton: true,
           onTap: () {
             if(!hasStory) {
               Navigator.pushNamed(context, AppRoutes.createStory);

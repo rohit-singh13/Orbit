@@ -44,22 +44,24 @@ class FriendProvider extends ChangeNotifier{
   Future<void> loadFriends(
       String uid,
       ) async {
+    print("Loading friends for: $uid");
     final friendships = await _friendServices.getFriends(uid);
+    print("Friendships found: ${friendships.length}");
     List<UserModel> loadedFriends = [];
     for (final friendship in friendships) {
       final friendUid = friendship.userA == uid
           ? friendship.userB
           : friendship.userA;
+      print("Friend UID: $friendUid");
 
-      final user = await _firestoreServices.getUser(
-        friendUid,
-      );
+      final user = await _firestoreServices.getUser(friendUid);
 
       if (user != null) {
         loadedFriends.add(user);
       }
     }
     _friends = loadedFriends;
+    print("Loaded friends: ${_friends.length}");
     notifyListeners();
   }
 

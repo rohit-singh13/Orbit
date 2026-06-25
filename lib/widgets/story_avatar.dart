@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:orbit/routes/app_routes.dart';
 
 class StoryAvatar extends StatelessWidget {
   final String? imageUrl;
@@ -12,7 +13,7 @@ class StoryAvatar extends StatelessWidget {
   const StoryAvatar({
     super.key,
     this.imageUrl,
-    this.radius = 35,
+    this.radius = 85,
     this.hasStory = false,
     this.hasViewedAll = false,
     this.showAddButton = false,
@@ -44,24 +45,29 @@ class StoryAvatar extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           avatar,
-
-          if(showAddButton)
+          if (showAddButton)
             Positioned(
               right: 0,
-                bottom: 0,
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.blue,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
+              bottom: 0,
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.blue,
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  icon: const Icon(
                     Icons.add,
                     color: Colors.white,
-                    size: 18,
                   ),
-                ))
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRoutes.createStory,);
+                  },
+                  iconSize: 18,
+                ),
+              ),
+            ),
         ],
-      ),
+      )
     );
   }
 }

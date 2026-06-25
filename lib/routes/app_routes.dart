@@ -36,7 +36,7 @@ class AppRoutes {
   static const chatList = "/Chat-List-screen";
   static const signal = "/signal-video-screen";  // as reels
   static const stories = "/stories-screen";
-  static const explore = "/explore-screen"; // as exploration
+  static const explore = "/explore-screen";
   static const editProfile = "/edit-profile-screen";
   static const settings = "/settings";
   static const privacy = "/privacy";

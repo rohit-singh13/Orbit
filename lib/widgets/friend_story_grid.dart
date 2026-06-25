@@ -47,7 +47,6 @@ class FriendStoryGrid extends StatelessWidget {
               child: CircularProgressIndicator(),
             );
           }
-
           final stories = snapshot.data ?? [];
 
           final friendStories = stories.where(
@@ -65,15 +64,13 @@ class FriendStoryGrid extends StatelessWidget {
           }
 
           return GridView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
               itemCount: storyGroups.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  crossAxisSpacing: 20,
+                  crossAxisSpacing: 16,
                   mainAxisSpacing: 20,
-                childAspectRatio: 0.9
+                childAspectRatio: 0.75
               ),
               itemBuilder: (context, index) {
               final group = storyGroups[index];
@@ -85,11 +82,10 @@ class FriendStoryGrid extends StatelessWidget {
               return FriendStoryTile(
                 storyGroup: group,
                 hasViewedAll: hasViewedAll,
-                onTap: () {
-                  //open story view screen
-                },
+                onTap: () {},
               );
               }
+
           );
         }
     );

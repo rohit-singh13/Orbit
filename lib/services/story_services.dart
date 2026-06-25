@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:orbit/firebase/firebase_collections.dart';
 import 'package:orbit/models/story_model.dart';
+import 'package:orbit/models/user_model.dart';
+import 'package:orbit/services/firestore_services.dart';
 
 class StoryServices {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -67,6 +69,23 @@ class StoryServices {
       "viewers":
       FieldValue.arrayUnion([userId]),
     });
+  }
+
+  Future<List<UserModel>> getStoryViewers(
+      List<String> viewerIds,
+      ) async {
+    List<UserModel> viewers = [];
+
+    for (final uid in viewerIds) {
+      final user =
+      await FirestoreServices().getUser(uid);
+
+      if (user != null) {
+        viewers.add(user);
+      }
+    }
+
+    return viewers;
   }
 
 }

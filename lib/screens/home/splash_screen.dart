@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:orbit/providers/friend_provider.dart';
 import 'package:orbit/providers/user_provider.dart';
 import 'package:orbit/routes/app_routes.dart';
 import 'package:orbit/services/auth_services.dart';
@@ -31,6 +32,7 @@ class _SplashScreenState extends State<SplashScreen> {
         userProvider.setUser(userData);
         await userProvider.updateOnlineStatus(true);
         userProvider.loadLocalImage(uid);
+        await context.read<FriendProvider>().loadFriends(uid);
       }
       if (!mounted) return;
       Navigator.pushReplacementNamed(

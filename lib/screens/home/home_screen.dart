@@ -26,29 +26,51 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text("Orbit"),
       ),
       body: AppBackground(
-          child: Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    const SizedBox(height: 40,),
-
-                    StreamBuilder<List<StoryModel>>(
-                        stream: StoryServices().streamUserStories(
-                        currentUser.uid
-                        ),
-                        builder: (context, snapshot) {
-                          return MyStoryWidget(
-                              imageUrl: currentUser.imageUrl,
-                              stories: snapshot.data ?? []
-                          );
-                        }),
-
-                    const SizedBox(height: 30,),
-
-                    FriendStoryGrid(friends: friends)
-                  ],
+        child: Column(
+          children: [
+            Expanded(
+              flex: 4,
+              child: Center(
+                child: StreamBuilder<List<StoryModel>>(
+                  stream: StoryServices().streamUserStories(currentUser.uid,),
+                  builder: (context, snapshot) {
+                    return MyStoryWidget(
+                      imageUrl: currentUser.imageUrl,
+                      stories: snapshot.data ?? [],
+                    );
+                  },
                 ),
-              ))),
+              ),
+            ),
+            SizedBox(height: 10,),
+
+            const Divider(height: 1, color: Colors.white12,),
+
+            SizedBox(height: 10,),
+
+            Expanded(
+              flex: 6,
+              child: Column(
+                children: [
+                  const Text(
+                    "Friend's Moments",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  Flexible(
+                    child: FriendStoryGrid(friends: friends,),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
       bottomNavigationBar: BottomNavigation(
           currentIndex: 0,
           onTap: (index) {
